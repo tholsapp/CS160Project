@@ -1,7 +1,6 @@
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_security import Security, SQLAlchemyUserDatastore
-from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_restless import APIManager
 
@@ -13,8 +12,6 @@ db = SQLAlchemy()
 apimanager = APIManager()
 # Initialize Flask-LoginManager
 login_manager = LoginManager()
-# Hashing Algorithm
-bcrypt = Bcrypt()
 
 def init_app():
   """ Configure app """
@@ -29,17 +26,15 @@ def init_app():
   # Setup Flask-Login
   login_manager.init_app(app)
   login_manager.login_view =  "login"
-  # Setup Bcrypt
-  bcrypt.init_app(app)
 
   from models import User, Role
   # Setup Flask-Security
   user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-  #security = Security(app, user_datastore)
-  Security(app, user_datastore)
+  security = Security(app, user_datastore)
   db.create_all()
-
+  # Setup Flask-Restless
   apimanager.init_app(app, flask_sqlalchemy_db=db)
+
   return app;
 
 import views

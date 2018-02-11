@@ -10,9 +10,7 @@ from sqlalchemy import Binary, Boolean, DateTime, Column, Integer, \
 
 from sqlalchemy.ext.hybrid import hybrid_property
 
-#from passlib.hash import bcrypt
-
-from fserver import apimanager, db, bcrypt
+from fserver import apimanager, db
 
 class RolesUsers(db.Model):
   __tablename__ = 'roles_users'
@@ -41,11 +39,6 @@ class User(db.Model, UserMixin):
   roles = relationship('Role', secondary='roles_users',
                       backref=backref('users', lazy='dynamic'))
 
-  #@hybrid_property
-  #def _password(self):
-  #  return self.password
-
-  #@_password.setter
   def set_password(self, plaintext):
     self.password = pbkdf2_sha256.hash(plaintext)
 
