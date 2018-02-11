@@ -3,9 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_security import Security, SQLAlchemyUserDatastore
 from flask_login import LoginManager
 from flask_restless import APIManager
+from flask_bootstrap import Bootstrap
 
 # Initialize Flask Application
 app = Flask(__name__)
+# Initialize Flask-Bootstrap
+Bootstrap(app)
 # Initialize Flask-SQLAlchemy
 db = SQLAlchemy()
 # Initialize Flask-Restless
