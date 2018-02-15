@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h1>Google Map</h1>
+
+    <div id="map"></div>
+    <script>
+      function initMap() {
+        var sjc = {lat: 37.357944, lng: -121.897087};
+	var sfo = {lat: 37.6213129, lng: -122.3789554};
+	var oak = {lat: 37.7125689, lng: -122.2197428};
+
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 4,
+          center: sjc
+        });
+        var sfo_marker = new google.maps.Marker({
+          position: sfo,
+          map: map
+        });
+  	var sjo_marker = new google.maps.Marker({
+          position: sjc,
+          map: map
+        });
+    	 var oak_marker = new google.maps.Marker({
+          position: oak,
+          map: map
+        });
+      }
+    </script>
+
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyASh_MzDRPXhWA2VlhANyBA5cPYJcOyOA4&callback=initMap">
+    </script>
+{% endblock %}

@@ -13,6 +13,17 @@
 		<!-- JavaScript Library -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
+
+		{% block style %}
+		<style>
+			#map {
+				height: 500px;
+				width: 100%;
+			}
+		</style>
+
+		{% endblock %}
+
 		{% if title %}
 		<title>{{ title }} - Web App</title>
 		{% else %}
@@ -49,6 +60,7 @@
 		<div class="footer">
 			<hr>
 			<p>CS160 - 2018</p>
+			</hr>
 		</div>
 	</body>
 	{% endblock %}
