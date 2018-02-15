@@ -1,16 +1,12 @@
 
 from passlib.hash import pbkdf2_sha256
 
-from flask_sqlalchemy import SQLAlchemy
 from flask_security import UserMixin, RoleMixin
-from sqlalchemy import create_engine
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import Binary, Boolean, DateTime, Column, Integer, \
                        String, ForeignKey
 
-from sqlalchemy.ext.hybrid import hybrid_property
-
-from fserver import apimanager, db
+from fserver.database import db
 
 class RolesUsers(db.Model):
   __tablename__ = 'roles_users'
@@ -36,15 +32,14 @@ class User(db.Model, UserMixin):
   current_login_ip = Column(db.String(100))
   login_count = db.Column(db.Integer())
   confirmed_at = db.Column(db.DateTime())
-  roles = relationship('Role', secondary='roles_users',
-                      backref=backref('users', lazy='dynamic'))
+  roles = db.relationship('Role', secondary='roles_users',
+                      backref=backref('user', lazy='dynamic'))
 
   def set_password(self, plaintext):
     self.password = pbkdf2_sha256.hash(plaintext)
 
   def verify_password(self, plaintext):
     return pbkdf2_sha256.verify(plaintext, self.password)
-    #return bcrypt.check_password_hash(self.password, plaintext)
 
   def is_active():
     return True
@@ -59,5 +54,3 @@ class User(db.Model, UserMixin):
     return self.id
 
 
-# Create Endpoints
-apimanager.create_api(User)

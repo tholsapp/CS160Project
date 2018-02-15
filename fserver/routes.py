@@ -2,10 +2,12 @@
 from passlib.hash import pbkdf2_sha256
 
 
-from flask import Flask, render_template, redirect, url_for, \
-    flash, request, abort
+from flask import Flask, session, render_template, redirect, url_for, \
+    current_app, flash, request, abort
 from flask_login import current_user, login_user, \
     logout_user, login_required
+from flask_principal import Permission, RoleNeed, Identity, AnonymousIdentity, \
+     identity_changed
 from flask_security.utils import verify_password, encrypt_password
 from werkzeug.urls import url_parse
 from passlib.hash import bcrypt
@@ -15,11 +17,35 @@ from models import User
 from forms import LoginForm, RegistrationForm
 
 
+# Create a permission with a single Need, in this case a RoleNeed.
+admin_permission = Permission(RoleNeed('admin'))
+user_permission = Permission(RoleNeed('user'))
+driver_permission = Permission(RoleNeed('driver'))
+
+
 @app.route('/')
 @app.route('/index')
-@login_required
 def home():
   return render_template('home.html')
+
+@app.route('/admin/dashboard')
+@admin_permission.require()
+def admin_dashboard():
+  return "<h1>Only Admins can view this page</h1>"
+
+@app.route('/user/dashboard')
+@user_permission.require()
+def user_dashboard():
+  return "<h1>Only Users can view this page</h1>"
+
+@app.route('/driver/dashboard')
+@driver_permission.require()
+def driver_dashboard():
+  return "<h1>Only Drivers can view this page</h1>"
+
+@app.route('/map')
+def map():
+  return render_template('map.html', title='Map')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -48,6 +74,9 @@ def login():
         and user.verify_password(form.password.data):
       flash('Logged in successfully.')
       login_user(user,remember=form.remember_me.data)
+      # Tell Flask-Principal the identity changed
+      identity_changed.send(current_app._get_current_object(),
+                          identity=Identity(user.id))
       return redirect(url_for('home'))
     else:
       flash('Invalid username or passowrd')
@@ -63,6 +92,15 @@ def logout():
   db.session.add(current_user)
   db.session.commit()
   logout_user()
+
+  # Remove session keys set by Flask-Principal
+  for key in ('identity.name', 'identity.auth_type'):
+      session.pop(key, None)
+
+  # Tell Flask-Principal the user is anonymous
+  identity_changed.send(current_app._get_current_object(),
+                      identity=AnonymousIdentity())
+
   return redirect('login')
 
 @login_manager.user_loader
