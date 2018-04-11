@@ -15,6 +15,7 @@ from passlib.hash import bcrypt
 from fserver import app, login_manager, db
 from models import User
 from forms import LoginForm, RegistrationForm
+from directions import Directions
 
 
 # Create a permission with a single Need, in this case a RoleNeed.
@@ -45,7 +46,16 @@ def driver_dashboard():
 
 @app.route('/map')
 def map():
-  return render_template('map.html', title='Map')
+  directions = Directions()
+  return render_template('map.html', title='Map',polylines=directions.total_polylines)
+
+@app.route('/copymap')
+def copymap():
+  return render_template('copyMap.html', title='Map')
+
+@app.route('/test-map')
+def temp_map():
+  return render_template('map/full.html');
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -72,8 +82,16 @@ def login():
     # Login and validate the user.
     if user is not None and user.password is not None \
         and user.verify_password(form.password.data):
+      if current_user.is_authenticated:
+        flash('User is already logged in')
+        return render_template('login.html', title='Sign In', form=form)
       flash('Logged in successfully.')
-      login_user(user,remember=form.remember_me.data)
+      # update the database
+      current_user.authenticated = True
+      db.session.add(current_user)
+      db.session.commit()
+      #login_user(user,remember=form.remember_me.data)
+      login_user(user, remember=False)
       # Tell Flask-Principal the identity changed
       identity_changed.send(current_app._get_current_object(),
                           identity=Identity(user.id))
@@ -82,7 +100,6 @@ def login():
       flash('Invalid username or passowrd')
       return redirect(url_for('login'))
   return render_template('login.html', title='Sign In', form=form)
-
 
 @app.route("/logout", methods=["GET"])
 @login_required
