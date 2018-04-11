@@ -1,0 +1,135 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>Hi, {{ current_user.username }}!</h1>
+
+
+<div id="floating-panel">
+	<strong>Start: </strong>
+	<select id="start">
+		<option value="chicago, il">Chicago</option>
+		<option value="st louis, mo">St Louis</option>
+		<option value="joplin, mo">Joplin, MO</option>
+		<option value="oklahoma city, ok">Oklahoma City</option>
+		<option value="amarillo, tx">Amarillo</option>
+		<option value="gallup, nm">Gallup, NM</option>
+		<option value="flagstaff, az">Flagstaff, AZ</option>
+		<option value="winona, az">Winona</option>
+		<option value="kingman, az">Kingman</option>
+		<option value="barstow, ca">Barstow</option>
+		<option value="san bernardino, ca">San Bernardino</option>
+		<option value="los angeles, ca">Los Angeles</option>
+	</select>
+	<strong>End: </strong>
+	<select id="end">
+		<option value="chicago, il">Chicago</option>
+		<option value="st louis, mo">St Louis</option>
+		<option value="joplin, mo">Joplin, MO</option>
+		<option value="oklahoma city, ok">Oklahoma City</option>
+		<option value="amarillo, tx">Amarillo</option>
+		<option value="gallup, nm">Gallup, NM</option>
+		<option value="flagstaff, az">Flagstaff, AZ</option>
+		<option value="winona, az">Winona</option>
+		<option value="kingman, az">Kingman</option>
+		<option value="barstow, ca">Barstow</option>
+		<option value="san bernardino, ca">San Bernardino</option>
+		<option value="los angeles, ca">Los Angeles</option>
+	</select>
+</div>
+
+<div id="map"></div>
+
+<script>
+
+var marker
+var autoDriveSteps = new Array();
+var speedFactor = 10; // 10x faster animated drive
+
+function initMap() {
+
+	var sjc = {lat: 37.357944, lng: -121.897087};
+	//var sfo = {lat: 37.6213129, lng: -122.3789554};
+	//var oak = {lat: 37.7125689, lng: -122.2197428};
+	var directionsService = new google.maps.DirectionsService;
+	var directionsDisplay = new google.maps.DirectionsRenderer;
+	var map = new google.maps.Map(document.getElementById('map'), {
+		zoom: 7,
+		center: sjc,
+		myTypeId: google.maps.MapTypeId.ROADMAP
+	});
+	directionsDisplay.setMap(map);
+
+	marker = new google.maps.Marker({
+		map: map,
+	});
+
+	var onChangeHandler = function() {
+		calculateAndDisplayRoute(directionsService, directionsDisplay);
+	};
+	document.getElementById('start').addEventListener('change', onChangeHandler);
+	document.getElementById('end').addEventListener('change', onChangeHandler);
+}
+
+function calculateAndDisplayRoute(directionsService, directionsDisplay) {
+	directionsService.route({
+		origin: document.getElementById('start').value,
+		destination: document.getElementById('end').value,
+		travelMode: 'DRIVING'
+	}, function(response, status) {
+		if (status === 'OK') {
+			directionsDisplay.setDirections(response);
+			// calculate positions for the animation steps
+			// the result is an array of LatLng, stored in autoDriveSteps
+			autoDriveSteps = new Array();
+			var remainingSeconds = 0;
+			var leg = response.routes[0].legs[0]; // supporting single route, legs currently
+			leg.steps.forEach(function(step) {
+				var stepSeconds = step.duration.value;
+				var nextStopSeconds = speedFactor - remainingSeconds;
+				while(nextStopSeconds <= stepSeconds) {
+					var nextStopLatLng = getPointBetween(step.start_location, step.end_location,nextStopSeconds / stepSeconds);
+					autoDriveSteps.push(nextStopLatLng);
+					nextStopSeconds += speedFactor;
+				}
+				remainingSeconds = stepSeconds + speedFactor - nextStopSeconds;
+			});
+
+			if (remainingSeconds > 0) {
+				autoDriveSteps.push(leg.end_location);
+			}
+			startRouteAnimation(marker);
+		} 
+		else {
+			window.alert('Directions request failed due to ' + status);
+		}
+	});
+}
+
+// helper method to calculate a point between A and B at some ratio
+function getPointBetween(a, b, ratio) {
+    return new google.maps.LatLng(a.lat() + (b.lat() - a.lat()) * ratio, a.lng() + (b.lng() - a.lng()) * ratio);
+}
+
+// start the route simulation   
+function startRouteAnimation(marker) {
+	var autoDriveTimer = setInterval(function () {
+		// stop the timer if the route is finished
+		if (autoDriveSteps.length === 0) {
+			clearInterval(autoDriveTimer);
+		} else {
+			// move marker to the next position (always the first in the array)
+			marker.setPosition(autoDriveSteps[0]);
+			// remove the processed position
+			autoDriveSteps.shift();
+		}
+	},
+	1000);
+}
+
+</script>
+
+<script async defer
+     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyASh_MzDRPXhWA2VlhANyBA5cPYJcOyOA4&libraries=geometry&callback=initMap">
+</script>
+{% endblock %}
