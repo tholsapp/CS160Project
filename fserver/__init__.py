@@ -24,6 +24,7 @@ principal_manager = Principal(app)
 def init_app():
   """ Configure app """
   app.config['DEBUG'] = True
+  app.config['THREADED'] = True
   app.config['SECRET_KEY'] = 'super-secret'
   app.config['SQLALCHEMY_DATABASE_URI'] = db_connection()
   app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -101,5 +102,5 @@ def init_db():
 
   db.session.commit()
 
-
+""" Circular Import """
 import routes

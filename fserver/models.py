@@ -53,4 +53,17 @@ class User(db.Model, UserMixin):
   def get_id(self):
     return self.id
 
+class CreditCard(db.Model):
+  id = db.Column(Integer(), primary_key=True)
+  __tablename__ = 'creditcard'
+  card_number = db.Column(db.String(16))
+  exp = db.Column(db.String(4))
+  cvc = db.Column(db.String(5))
+  zipcode = db.Column(db.String(5))
+
+class ZipCode(db.Model):
+  __tablename__ = 'zipcode'
+  id = db.Column(db.Integer, primary_key=True, unique=True)
+  zipcode = db.Column(db.String(5), unique=True)
+
 

@@ -14,49 +14,17 @@
 				<img src="static/image/SJSULogo.png" width="262" height="42" class="d-inline-block align-top" alt="">
 			</a>
 		</div>
-		<div class="collapse navbar-collapse" id="myNavbar">
+		<div class="collapse navbar-collapse navbar-right" id="myNavbar">
 			<ul class="nav navbar-nav">
 				{% if current_user.is_authenticated %}
+				<li><a href="{{ url_for('user_dashboard') }}">Your-Dashboard</a></li>
 				<li><a href="{{ url_for('logout') }}">Logout</a></li>
+				<li><a href="{{ url_for('about') }}">About</a></li>
 				{% else %}
 				<li><a href="{{ url_for('login') }}">Login</a></li>
-
 				<li><a href="{{ url_for('register') }}">Register</a></li>
-
+				<li><a href="{{ url_for('about') }}">About</a></li>
 				{% endif %}
-
-				<li class="dropdown">
-					<a class="dropdown-toggle" data-toggle="dropdown" href="#">Page 1
-						<span class="caret"></span></a>
-					<ul class="dropdown-menu">
-						<li><a href="#">Page 1-1</a></li>
-						<li><a href="#">Page 1-2</a></li>
-						<li><a href="#">Page 1-3</a></li>
-					</ul>
-				</li>
-			</ul>
-			<ul class="nav navbar-nav navbar-right">
-				<!-- Search form -->
-				<div class="input-group">
-					<input type="text" class="form-control" placeholder="Search">
-					<div class="input-group-btn">
-						<button class="btn btn-default" type="submit">
-							<i class="glyphicon glyphicon-search"></i>
-						</button>
-					</div>
-				</div>
-				<li>
-					<a href="{{ url_for('register') }}">
-						<span class="glyphicon glyphicon-user">
-						</span> Sign Up
-					</a>
-				</li>
-				<li>
-					<a href="{{ url_for('login') }}">
-						<span class="glyphicon glyphicon-log-in">
-						</span> Login
-					</a>
-				</li>
 			</ul>
 		</div>
 	</div>

@@ -6,12 +6,14 @@ from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from models import User
 
 class LoginForm(FlaskForm):
+  """ Login Form  """
   username = StringField('Username', validators=[DataRequired()])
   password = PasswordField('Password', validators=[DataRequired()])
   remember_me = BooleanField('Remember Me')
   submit = SubmitField('Sign In')
 
 class RegistrationForm(FlaskForm):
+  """ Registration Form  """
   username = StringField('Username', validators=[DataRequired()])
   email = StringField('Email', validators=[DataRequired(), Email()])
   password = PasswordField('Password', validators=[DataRequired()])
@@ -28,4 +30,18 @@ class RegistrationForm(FlaskForm):
     user = User.query.filter_by(email=email.data).first()
     if user is not None:
       raise ValidationError('Please use a different email address.')
+
+class CreditCardForm(FlaskForm):
+  """ Credit Card Form """
+  card = StringField('Card Number', validators=[DataRequired()])
+  exp = StringField('Expiration Date', validators=[DataRequired()])
+  cvc = StringField('CVC', validators=[DataRequired()])
+  zipcode = StringField('Zipcode', validators=[DataRequired()])
+
+  def validate_card(self, card, exp, csv, zipcode):
+    return false
+
+class AddressForm(FlaskForm):
+  """ Address Form """
+  destination = StringField('Destination', validators=[DataRequired])
 

@@ -6,60 +6,41 @@
 		<!-- Required meta tags -->
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<!--  Bootstrap Minified CSS -->
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 		<!-- JQuery Library -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<!--  Bootstrap Minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 		<!-- JavaScript Library -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<!-- Include Styling -->
+		<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-
-		{% block style %}
-		<style>
-			#map {
-				height: 500px;
-				width: 100%;
-			}
-		</style>
-
-		{% endblock %}
 
 		{% if title %}
-		<title>{{ title }} - Web App</title>
+		<title>{{ title }} - Let it Fly</title>
 		{% else %}
-		<title>Web App</title>
+		<title>Let it Fly</title>
 		{% endif %}
 	</head>
 	{% endblock %}
 
 	{% block body %}
 	<body>
-		<!-- Naviagtion Bar -->
-		{% block navbar %}
-		{% include 'include/navbar.html' %}
-		{% endblock %}
-
-		<hr>
-		{% with messages = get_flashed_messages() %}
-		{% if messages %}
-		<ul>
-			{% for message in messages %}
-			<li>{{ message }}</li>
-			{% endfor %}
-		</ul>
-		{% endif %}
-		{% endwith %}
+		<div id="topnav">
+			{% block navbar %}
+			{% include 'include/navbar.html' %}
+			{% endblock %}
+		</div>
 		<!-- Page Content -->
-		<div class="container">
-			<div class="content">
-				{% block content %}
-				{% endblock %}
-			</div>
+		<div id="content">
+			{% block content %}
+			{% endblock %}
 		</div>
 		<!-- Footer -->
-		<div class="footer">
+		<div id="footer">
 			<hr>
-			<p>CS160 - 2018</p>
+			<p>CS160 - 2018 --  
+			<a href="https://github.com/tholsapp/CS160Project">  GITHUB</a></p>
 			</hr>
 		</div>
 	</body>
