@@ -1,145 +1,33 @@
 
 {% extends "layout.html" %}
 
+
 {% block content %}
 <h1>Hi, {{ current_user.username }}!</h1>
-<div id="locationField">
-      <input id="autocomplete" placeholder="Enter your address"
-             onFocus="geolocate()" type="text"></input>
-    </div>
 
-    <table id="address">
-      <tr>
-        <td class="label">Street address</td>
-        <td class="slimField"><input class="field" id="street_number"
-              disabled="true"></input></td>
-        <td class="wideField" colspan="2"><input class="field" id="route"
-              disabled="true"></input></td>
-      </tr>
-      <tr>
-        <td class="label">City</td>
-        <!-- Note: Selection of address components in this example is typical.
-             You may need to adjust it for the locations relevant to your app. See
-             https://developers.google.com/maps/documentation/javascript/examples/places-autocomplete-addressform
-        -->
-        <td class="wideField" colspan="3"><input class="field" id="locality"
-              disabled="true"></input></td>
-      </tr>
-      <tr>
-        <td class="label">State</td>
-        <td class="slimField"><input class="field"
-              id="administrative_area_level_1" disabled="true"></input></td>
-        <td class="label">Zip code</td>
-        <td class="wideField"><input class="field" id="postal_code"
-              disabled="true"></input></td>
-      </tr>
-      <tr>
-        <td class="label">Country</td>
-        <td class="wideField" colspan="3"><input class="field"
-              id="country" disabled="true"></input></td>
-      </tr>
-    </table>
-
-
-<div id="floating-panel">
-	<form action="/request-ride" method="post">
-	<strong>Start: </strong>
-	<select id="start">
-		<option value="san jose airport, ca">SJC</option>
-		<option value="san francisco airport, ca">SFO</option>
-		<option value="oakland airport, ca">OAK</option>
-	</select>
-	<strong>End: </strong>
-	<select id="end">
-		<option value="chicago, il">Chicago</option>
-		<option value="st louis, mo">St Louis</option>
-		<option value="joplin, mo">Joplin, MO</option>
-		<option value="oklahoma city, ok">Oklahoma City</option>
-		<option value="amarillo, tx">Amarillo</option>
-		<option value="gallup, nm">Gallup, NM</option>
-		<option value="flagstaff, az">Flagstaff, AZ</option>
-		<option value="winona, az">Winona</option>
-		<option value="kingman, az">Kingman</option>
-		<option value="barstow, ca">Barstow</option>
-		<option value="san bernardino, ca">San Bernardino</option>
-		<option value="los angeles, ca">Los Angeles</option>
-	</select>
-	<button onclick="">Click me</button>
-	 <!-- <button onclick="calculateAndDisplayRoute()">Click me</button>  -->
-	</form>
-</div>
-
-<div id="map"></div>
+    <h1>Request A Ride</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.startLocation.label }}<br>
+            {{ form.startLocation(size=32) }}<br>
+            {% for error in form.startLocation.errors %}
+            	<span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.endLocation.label }}<br>
+            {{ form.endLocation(size=32) }}<br>
+            {% for error in form.endLocation.errors %}
+            	<span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
 
 <script>
-var placeSearch, autocomplete;
-      var componentForm = {
-        street_number: 'short_name',
-        route: 'long_name',
-        locality: 'long_name',
-        administrative_area_level_1: 'short_name',
-        country: 'long_name',
-        postal_code: 'short_name'
-      };
-
-      function initAutocomplete() {
-        // Create the autocomplete object, restricting the search to geographical
-        // location types.
-        autocomplete = new google.maps.places.Autocomplete(
-            /** @type {!HTMLInputElement} */(document.getElementById('autocomplete')),
-            {types: ['geocode']});
-
-        // When the user selects an address from the dropdown, populate the address
-        // fields in the form.
-        autocomplete.addListener('place_changed', fillInAddress);
-      }
-
-      function fillInAddress() {
-        // Get the place details from the autocomplete object.
-        var place = autocomplete.getPlace();
-
-        for (var component in componentForm) {
-          document.getElementById(component).value = '';
-          document.getElementById(component).disabled = false;
-        }
-
-        // Get each component of the address from the place details
-        // and fill the corresponding field on the form.
-        for (var i = 0; i < place.address_components.length; i++) {
-          var addressType = place.address_components[i].types[0];
-          if (componentForm[addressType]) {
-            var val = place.address_components[i][componentForm[addressType]];
-            document.getElementById(addressType).value = val;
-          }
-        }
-      }
-
-      // Bias the autocomplete object to the user's geographical location,
-      // as supplied by the browser's 'navigator.geolocation' object.
-      function geolocate() {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(function(position) {
-            var geolocation = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            };
-            var circle = new google.maps.Circle({
-              center: geolocation,
-              radius: position.coords.accuracy
-            });
-            autocomplete.setBounds(circle.getBounds());
-          });
-        }
-      }
-
-
 
 var map
-var driverMarker;
-var directionsService;
-var directionsDisplay;
-var autoDriveSteps = new Array();
-var speedFactor = 10; // 10x faster animated drive
 
 var sjc = {lat: 37.357944, lng: -121.897087};
 var sfo = {lat: 37.6213129, lng: -122.3789554};
@@ -147,141 +35,15 @@ var oak = {lat: 37.7125689, lng: -122.2197428};
 
 
 function initMap() {
-	initAutocomplete();
-
 	directionsService = new google.maps.DirectionsService;
 	directionsDisplay = new google.maps.DirectionsRenderer;
-
 
 	map = new google.maps.Map(document.getElementById('map'), {
 		zoom: 7,
 		center: sjc,
 		myTypeId: google.maps.MapTypeId.ROADMAP
 	});
-
 	directionsDisplay.setMap(map);
-
-	driverMarker = new google.maps.Marker({
-		map: map,
-	});
-	// var onChangeHandler = function() {
-	// 	calculateAndDisplayRoute(directionsService, directionsDisplay);
-	// };
-	//document.getElementById('start').addEventListener('change', onChangeHandler);
-	//document.getElementById('end').addEventListener('change', onChangeHandler);
-}
-
-function requestRide() {
-		directionsService.route({
-		origin: document.getElementById('start').value,
-		destination: document.getElementById('end').value,
-		unitSystem: google.maps.UnitSystem.IMPERIAL,
-		optimizeWaypoints: true,
-		travelMode: 'DRIVING',
-		drivingOptions: {
-    		departureTime: new Date(Date.now()),  // for the time N milliseconds from now.
-    		trafficModel: 'optimistic',
-  		},
-	}, function(response, status) {
-		if (status === 'OK') {	
-		} 
-		else {
-			window.alert('Directions request failed due to ' + status);
-		}
-	});
-}
-
-function calculateAndDisplayRoute() {
-	directionsService.route({
-		origin: document.getElementById('start').value,
-		destination: document.getElementById('end').value,
-		unitSystem: google.maps.UnitSystem.IMPERIAL,
-		optimizeWaypoints: true,
-		travelMode: 'DRIVING',
-		drivingOptions: {
-    		departureTime: new Date(Date.now()),  // for the time N milliseconds from now.
-    		trafficModel: 'optimistic',
-  		},
-	}, function(response, status) {
-		if (status === 'OK') {	
-			directionsDisplay.setDirections(response);
-			// calculate positions for the animation steps
-			// the result is an array of LatLng, stored in autoDriveSteps
-			autoDriveSteps = new Array();
-			var totalTime = 0;
-			var remainingSeconds = 0;
-
-			var polyline = new google.maps.Polyline({
-  				path: [],
- 			 	strokeColor: '#FF0000',
-  				strokeWeight: 3
-			});
-			var bounds = new google.maps.LatLngBounds();
-
-			var legs = response.routes[0].legs;
-      		for (i = 0; i < legs.length; i++) {
-        		var steps = legs[i].steps;
-        		for (j = 0; j < steps.length; j++) {
-          			var nextSegment = steps[j].path;
-          			for (k = 0; k < nextSegment.length; k++) {
-            			polyline.getPath().push(nextSegment[k]);
-            			bounds.extend(nextSegment[k]);
-          			}
-        		}
-      		}
-
-      		polyline.setMap(map);
-
-      		console.log(polyline.getPath());
-
-			var leg = response.routes[0].legs[0]; // supporting single route, legs currently
-			leg.steps.forEach( function(step) {
-				var stepSeconds = step.duration.value;
-				totalTime += stepSeconds;
-				var nextStopSeconds = speedFactor - remainingSeconds;
-				while(nextStopSeconds <= stepSeconds) {
-					var nextStopLatLng = getPointBetween(step.start_location, step.end_location, nextStopSeconds / stepSeconds);
-					autoDriveSteps.push(nextStopLatLng);
-					nextStopSeconds += speedFactor;
-				}
-				remainingSeconds = stepSeconds + speedFactor - nextStopSeconds;
-			
-				if (remainingSeconds > 0) {
-					autoDriveSteps.push(leg.end_location);
-				}
-			});
-			console.log("totalTime (Seconds) = " + totalTime);
-			console.log("Time = " + totalTime / 60 + " minutes");
-
-			startRouteAnimation(driverMarker, polyline);
-		} 
-		else {
-			window.alert('Directions request failed due to ' + status);
-		}
-	});
-}
-
-// helper method to calculate a point between A and B at some ratio
-function getPointBetween(a, b, ratio) {
-    return new google.maps.LatLng(a.lat() + (b.lat() - a.lat()) * ratio, a.lng() + (b.lng() - a.lng()) * ratio);
-}
-
-// start the route simulation   
-function startRouteAnimation(marker, pLine) {
-	var autoDriveTimer = setInterval(function () {
-		// stop the timer if the route is finished
-		if (autoDriveSteps.length === 0) {
-			clearInterval(autoDriveTimer);
-			initMap();
-		} else {
-			pLine.setPath(pLine.getPath());
-			// move marker to the next position (always the first in the array)
-			marker.setPosition(autoDriveSteps[0]);
-			//console.log(autoDriveSteps[0])
-			// remove the processed position
-			autoDriveSteps.shift();
-		}
-	}, 1000);
 }
 
 </script>

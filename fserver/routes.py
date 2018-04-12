@@ -38,11 +38,15 @@ def about():
 # def admin_dashboard():
 #   return "<h1>Only Admins can view this page</h1>"
 
-@app.route('/user/dashboard')
-@user_permission.require()
-def user_dashboard():
+
+@app.route('/map', methods=['GET', 'POST'])
+def map():
   """  """
-  return render_template('user_dashboard.html')
+  if request.method == 'GET':
+    origin = request.args['origin']
+    destination = request.args['destination']
+    return render_template('map.html', origin=origin,destination=destination)
+  return render_template('map.html')
 
 @app.route('/request-ride', methods=['GET', 'POST'])
 def request_ride():
@@ -55,15 +59,17 @@ def request_ride():
 # def driver_dashboard():
 #   return "<h1>Only Drivers can view this page</h1>"
 
-@app.route('/map', methods=['GET', 'POST'])
-def map(): 
+
+@app.route('/user/dashboard', methods=['GET', 'POST'])
+@user_permission.require()
+def user_dashboard():
   """  """
   form = RideRequestForm()
   if form.validate_on_submit():
     #form.validate_start_address()
     flash('Congratualtions, you made a request')
-    return redirect(url_for('home'))
-  return render_template('map.html', title='Map', form=form)
+    return redirect(url_for('map',origin=form.startLocation,destination=form.endLocation))
+  return render_template('user_dashboard.html', form=form)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -96,11 +102,11 @@ def login():
         flash('User is already logged in')
         return render_template('login.html', title='Sign In', form=form)
       flash('Logged in successfully.')
-      session['user_id'] = form.user.id
       # update the database
       #login_user(user,remember=form.remember_me.data)
       login_user(user, remember=False)
       #current_user.authenticated = True
+      session['user_id'] = current_user.id
       
       # Tell Flask-Principal the identity changed
       identity_changed.send(current_app._get_current_object(),

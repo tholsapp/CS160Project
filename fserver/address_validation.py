@@ -39,11 +39,12 @@ class AddressValidator():
 			# TODO - increase address validation complexity
 			addr_components = req_js['results'][0]['address_components']
 			for comps in addr_components:
-				print comps
 				if comps['types'][0] == 'postal_code':
+					# if comps['short_name'] in MASTER ZIPCODE_DATABASE or ZIPCODE_LIST
 					if not comps['short_name'] == '95112':
 						print 'Invalid zipcode'
 						#return False
+			# passed validation, store internal values
 			self.address =  req_js['results'][0]['formatted_address']
 		return True
 

@@ -44,8 +44,8 @@ class CreditCardForm(FlaskForm):
 
 class RideRequestForm(FlaskForm):
   """ Address Form """
-  startLocation = StringField('Start', validators=[DataRequired()])
-  endLocation = StringField('End', validators=[DataRequired()])
+  startLocation = StringField('Start Location', validators=[DataRequired()])
+  endLocation = StringField('End Location', validators=[DataRequired()])
   submit = SubmitField('Request Ride')
 
   def validate(self):
@@ -54,9 +54,9 @@ class RideRequestForm(FlaskForm):
     if not rv:
       return False
 
-    start_validator = AddressValidator()
+    origin_validator = AddressValidator()
     # Check if not valid origin
-    if not start_validator.is_valid_address(self.startLocation.data):
+    if not origin_validator.is_valid_address(self.startLocation.data):
       self.startLocation.errors.append('Origin: Invalid Location')
       return False
 
@@ -66,11 +66,13 @@ class RideRequestForm(FlaskForm):
       self.endLocation.errors.append('Destination: Invalid Location')
       return False
 
-    if self.startLocation.data == self.endLocation.data:
-      self.startLocation.errors.append('Origin cannot match destination')
-      self.endLocation.error.append('Destination cannot match origin')
-      return False
-    # Passed validation, return True
+    # if self.startLocation.data == self.endLocation.data:
+    #   self.startLocation.errors.append('Origin cannot match destination')
+    #   self.endLocation.error.append('Destination cannot match origin')
+    #   return False
+    # Passed validation
+    self.startLocation = origin_validator.address
+    self.endLocation = dest_validator.address
     return True
 
     
