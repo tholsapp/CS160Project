@@ -14,7 +14,7 @@ from passlib.hash import bcrypt
 
 from fserver import app, login_manager, db
 from models import User
-from forms import LoginForm, RegistrationForm
+from forms import LoginForm, RegistrationForm, RideRequestForm
 #from directions import Directions
 
 
@@ -25,7 +25,7 @@ driver_permission = Permission(RoleNeed('driver'))
 
 
 @app.route('/')
-@app.route('/index')
+@app.route('/index', methods=['GET', 'POST'])
 def home():
   return render_template('home.html')
 
@@ -44,16 +44,26 @@ def user_dashboard():
   """  """
   return render_template('user_dashboard.html')
 
+@app.route('/request-ride', methods=['GET', 'POST'])
+def request_ride():
+  if request.method == 'POST':
+    return redirect(url_for('home'))
+  return redirect(url_for('home'))
+
 # @app.route('/dashboard')
 # @driver_permission.require()
 # def driver_dashboard():
 #   return "<h1>Only Drivers can view this page</h1>"
 
-@app.route('/map')
+@app.route('/map', methods=['GET', 'POST'])
 def map(): 
   """  """
-  #directions = Directions()
-  return render_template('map.html', title='Map',)
+  form = RideRequestForm()
+  if form.validate_on_submit():
+    #form.validate_start_address()
+    flash('Congratualtions, you made a request')
+    return redirect(url_for('home'))
+  return render_template('map.html', title='Map', form=form)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -86,6 +96,7 @@ def login():
         flash('User is already logged in')
         return render_template('login.html', title='Sign In', form=form)
       flash('Logged in successfully.')
+      session['user_id'] = form.user.id
       # update the database
       #login_user(user,remember=form.remember_me.data)
       login_user(user, remember=False)

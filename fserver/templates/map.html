@@ -1,43 +1,54 @@
+
 {% extends "layout.html" %}
 
-{% block content %}
-<h1>Google Map</h1>
-<div id="map"></div>
-<script>
-function initMap() {
-	var sjc = {lat: 37.357944, lng: -121.897087};
-	//var sfo = {lat: 37.6213129, lng: -122.3789554};
-	//var oak = {lat: 37.7125689, lng: -122.2197428};
 
-	var map = new google.maps.Map(document.getElementById('map'), {
+{% block content %}
+<h1>Hi, {{ current_user.username }}!</h1>
+
+    <h1>Request Ride</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.startLocation.label }}<br>
+            {{ form.startLocation(size=32) }}<br>
+            {% for error in form.startLocation.errors %}
+            	<span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.endLocation.label }}<br>
+            {{ form.endLocation(size=32) }}<br>
+            {% for error in form.endLocation.errors %}
+            	<span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+
+<script>
+
+var map
+
+var sjc = {lat: 37.357944, lng: -121.897087};
+var sfo = {lat: 37.6213129, lng: -122.3789554};
+var oak = {lat: 37.7125689, lng: -122.2197428};
+
+
+function initMap() {
+	directionsService = new google.maps.DirectionsService;
+	directionsDisplay = new google.maps.DirectionsRenderer;
+
+	map = new google.maps.Map(document.getElementById('map'), {
+		zoom: 7,
 		center: sjc,
-		zoom: 13,
 		myTypeId: google.maps.MapTypeId.ROADMAP
 	});
-
-	var start_locations = [];
-	var end_locations = [];
-
-	var polylines = [];
-
-	{% for pl in polylines %}
-		var bounds = new google.maps.LatLngBounds();
-
-		var polyline = new google.maps.Polyline({
-			path: google.maps.geometry.encoding.decodePath("{{pl}}"),
-			map: map
-		});
-		polylines.push(polyline);
-
-		for (var i = 0; i < polyline.getPath().getLength(); i++) {
-			bounds.extend(polyline.getPath().getAt(i));
-		}
-		map.fitBounds(bounds);
-	{% endfor %}
+	directionsDisplay.setMap(map);
 }
+
 </script>
 
 <script async defer
-     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyASh_MzDRPXhWA2VlhANyBA5cPYJcOyOA4&libraries=geometry&callback=initMap">
+     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyASh_MzDRPXhWA2VlhANyBA5cPYJcOyOA4&libraries=geometry&libraries=places&callback=initMap">
 </script>
 {% endblock %}

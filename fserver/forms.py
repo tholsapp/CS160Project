@@ -1,9 +1,10 @@
 
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm, Form
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 
 from models import User
+from address_validation import AddressValidator
 
 class LoginForm(FlaskForm):
   """ Login Form  """
@@ -41,7 +42,36 @@ class CreditCardForm(FlaskForm):
   def validate_card(self, card, exp, csv, zipcode):
     return false
 
-class AddressForm(FlaskForm):
+class RideRequestForm(FlaskForm):
   """ Address Form """
-  destination = StringField('Destination', validators=[DataRequired])
+  startLocation = StringField('Start', validators=[DataRequired()])
+  endLocation = StringField('End', validators=[DataRequired()])
+  submit = SubmitField('Request Ride')
+
+  def validate(self):
+    """ handles all address validation """
+    rv = FlaskForm.validate(self)
+    if not rv:
+      return False
+
+    start_validator = AddressValidator()
+    # Check if not valid origin
+    if not start_validator.is_valid_address(self.startLocation.data):
+      self.startLocation.errors.append('Origin: Invalid Location')
+      return False
+
+    dest_validator = AddressValidator()
+    # check if not valid destination
+    if not dest_validator.is_valid_address(self.endLocation.data):
+      self.endLocation.errors.append('Destination: Invalid Location')
+      return False
+
+    if self.startLocation.data == self.endLocation.data:
+      self.startLocation.errors.append('Origin cannot match destination')
+      self.endLocation.error.append('Destination cannot match origin')
+      return False
+    # Passed validation, return True
+    return True
+
+    
 
