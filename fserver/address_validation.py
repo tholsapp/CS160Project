@@ -4,6 +4,9 @@ import requests
 
 class AddressValidator():
 
+	""" Helper class to validate addresses supplied by user 
+	Enforces address to be within counties (San Mateo, Santa Clara, Alameda """
+
 	geocode_url = 'https://maps.googleapis.com/maps/api/geocode/json'
 	key = 'AIzaSyASh_MzDRPXhWA2VlhANyBA5cPYJcOyOA4'
 
@@ -40,6 +43,7 @@ class AddressValidator():
 			addr_components = req_js['results'][0]['address_components']
 			for comps in addr_components:
 				if comps['types'][0] == 'postal_code':
+					# TODO add some kind of data to check if valid zip code (i.e. in the bay area)
 					# if comps['short_name'] in MASTER ZIPCODE_DATABASE or ZIPCODE_LIST
 					if not comps['short_name'] == '95112':
 						print 'Invalid zipcode'

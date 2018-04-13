@@ -1,0 +1,125 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>Hi, {{ current_user.username }}!</h1>
+
+<div id="map"></div>
+
+<script>
+
+var map;
+var directionsService;
+var markers = new Array();
+var speedFactor = 100; // 10x faster animated drive
+
+var sjc = {lat: 37.357944, lng: -121.897087};
+var sfo = {lat: 37.6213129, lng: -122.3789554};
+var oak = {lat: 37.7125689, lng: -122.2197428};
+
+function initMap() {
+	var mapOptions = {
+		center: sjc,
+		zoom: 14
+	};
+	map = new google.maps.Map(document.getElementById('map'),
+			mapOptions);
+	directionsService = new google.maps.DirectionsService();
+	// markerA = new google.maps.Marker({
+	// 	map: map,
+	// 	position: new google.maps.LatLng(42.3505, -71.1056)
+	// });
+	// markerB = new google.maps.Marker({
+	// 	map: map,
+	// 	position: new google.maps.LatLng(42.3405, -71.0756)
+	// });
+	calcRoute();
+}
+
+function calcRoute() {
+	var request = {
+		origin: '{{ origin }}',
+		destination: '{{ destination }}',
+		travelMode: google.maps.TravelMode.DRIVING
+	};
+
+	directionsService.route(request, function(response, status) {
+		if (status == google.maps.DirectionsStatus.OK) {
+			var pathPoints = response.routes[0].overview_path;
+			path = new google.maps.Polyline({
+				map: map,
+				path: pathPoints,
+				geodesic: true
+			})
+
+			console.log(response.routes[0]);
+
+			var distance = google.maps.geometry.spherical.computeLength(pathPoints);
+			var duration = response.routes[0].legs[0].duration['value'];
+			console.log('duration ' + duration);
+			// multiply by speedFactor
+			var speed = speedFactor * distance / duration;
+			var fps = 20;
+			var resolution = speed * (1 / fps);
+			getFineData(pathPoints, resolution).forEach(function(point) {
+				var marker = new google.maps.Marker({
+					map: map,
+					position: point
+				});
+				marker.setMap(null);
+				markers.push(marker);
+			});
+			startRouteAnimation();
+		}
+	});
+}
+
+
+function getFineData(roughData, resolution) {
+	var fineData = [];
+	var latLngA;
+	var latLngB;
+	var steps;
+	var step;
+	for (var i = 1; i < roughData.length; i++) {
+		latLngA = roughData[i - 1];
+		latLngB = roughData[i];
+		distanceDiff = google.maps.geometry.spherical.computeDistanceBetween(latLngA, latLngB);
+		steps = Math.ceil(distanceDiff / resolution);
+		step = 1 / steps;
+		previousInterpolatedLatLng = latLngA;
+		for (var j = 0; j < steps; j++) {
+			var interpolated = google.maps.geometry.spherical.interpolate(latLngA, latLngB, step * j);
+			fineData.push(interpolated);
+		}
+	}
+	console.log(fineData.length);
+	return fineData;
+}
+
+
+// start the route simulation   
+function startRouteAnimation() {
+	var autoDriveTimer = setInterval(function () {
+		// stop the timer if the route is finished
+		if (markers.length === 1) {
+			//clearInterval(autoDriveTimer);
+			window.location = "{{ url_for('home') }}"
+		} else {
+			markers[1].setMap(map);
+			var temp = markers.shift();
+			map.setCenter(temp.position);
+			temp.setMap(null);
+		}
+	}, 1000);
+}
+
+
+</script>
+
+
+<script async defer
+     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyASh_MzDRPXhWA2VlhANyBA5cPYJcOyOA4&libraries=geometry&libraries=places&callback=initMap">
+</script>
+{% endblock %}
+d
