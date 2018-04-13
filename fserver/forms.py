@@ -70,10 +70,10 @@ class RideRequestForm(FlaskForm):
     #   self.startLocation.errors.append('Origin cannot match destination')
     #   self.endLocation.error.append('Destination cannot match origin')
     #   return False
+    
     # Passed validation
     self.startLocation = origin_validator.address
     self.endLocation = dest_validator.address
     return True
 
     
-

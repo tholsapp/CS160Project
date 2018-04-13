@@ -9,18 +9,21 @@ from sqlalchemy import Binary, Boolean, DateTime, Column, Integer, \
 from fserver.database import db
 
 class RolesUsers(db.Model):
+  """ Model """
   __tablename__ = 'roles_users'
   id = db.Column(db.Integer(), primary_key=True)
   user_id = db.Column('user_id', db.Integer(), db.ForeignKey('user.id'))
   role_id = db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
 
 class Role(db.Model, RoleMixin):
+  """ Role Model """
   __tablename__ = 'role'
   id = db.Column(Integer(), primary_key=True)
   name = db.Column(db.String(80), unique=True)
   description = db.Column(db.String(255))
 
 class User(db.Model, UserMixin):
+  """ User model """
   __tablename__ = 'user'
   id = db.Column(db.Integer, primary_key=True, unique=True)
   email = db.Column(db.String(255), unique=True)
@@ -54,6 +57,7 @@ class User(db.Model, UserMixin):
     return self.id
 
 class CreditCard(db.Model):
+  """ Credit Card Model """
   id = db.Column(Integer(), primary_key=True)
   __tablename__ = 'creditcard'
   card_number = db.Column(db.String(16))
