@@ -25,6 +25,7 @@ def init_app():
   """ Configure app """
   app.config['DEBUG'] = True
   app.config['THREADED'] = True
+  app.config['use_reloader'] = True
   app.config['SECRET_KEY'] = 'super-secret'
   app.config['SQLALCHEMY_DATABASE_URI'] = db_connection()
   app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -47,6 +48,7 @@ def init_app():
   return app;
 
 def init_db():
+  """ Set up database with test users """
   app = init_app()
   if not Role.query.filter_by(name='admin').first() and \
       not Role.query.filter_by(name='user').first() and \

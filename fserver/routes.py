@@ -60,16 +60,16 @@ def request_ride():
 #   return "<h1>Only Drivers can view this page</h1>"
 
 
-@app.route('/user/dashboard', methods=['GET', 'POST'])
+@app.route('/dashboard/<user>', methods=['GET', 'POST'])
 @user_permission.require()
-def user_dashboard():
+def user_dashboard(user):
   """  """
   form = RideRequestForm()
   if form.validate_on_submit():
     #form.validate_start_address()
     flash('Congratualtions, you made a request')
     return redirect(url_for('map',origin=form.startLocation,destination=form.endLocation))
-  return render_template('user_dashboard.html', form=form)
+  return render_template('user_dashboard.html', form=form, user=user)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -113,7 +113,7 @@ def login():
                           identity=Identity(user.id))
       db.session.add(current_user)
       db.session.commit()
-      return redirect(url_for('user_dashboard'))
+      return redirect(url_for('user_dashboard', user=current_user))
     else:
       flash('Invalid username or passowrd')
       return redirect(url_for('login'))

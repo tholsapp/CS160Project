@@ -114,6 +114,8 @@ function calcRoute() {
 				geodesic: true
 			})
 
+			console.log(response.routes[0]);
+
 			var distance = google.maps.geometry.spherical.computeLength(pathPoints);
 			var duration = response.routes[0].legs[0].duration['value'];
 			console.log('duration ' + duration);
@@ -150,10 +152,10 @@ function getFineData(roughData, resolution) {
 		previousInterpolatedLatLng = latLngA;
 		for (var j = 0; j < steps; j++) {
 			var interpolated = google.maps.geometry.spherical.interpolate(latLngA, latLngB, step * j);
-			fineData.push(interpolated)
+			fineData.push(interpolated);
 		}
 	}
-	console.log(fineData.length)
+	console.log(fineData.length);
 	return fineData;
 }
 
