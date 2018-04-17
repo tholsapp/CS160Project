@@ -23,7 +23,6 @@ admin_permission = Permission(RoleNeed('admin'))
 user_permission = Permission(RoleNeed('user'))
 driver_permission = Permission(RoleNeed('driver'))
 
-
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
 def home():
@@ -37,7 +36,6 @@ def about():
 # @admin_permission.require()
 # def admin_dashboard():
 #   return "<h1>Only Admins can view this page</h1>"
-
 
 @app.route('/user_dashboard/<user>', methods=['GET', 'POST'])
 @user_permission.require()
@@ -83,7 +81,8 @@ def register():
   if form.validate_on_submit():
     db.session.add(User(username=form.username.data,
                       email=form.email.data,
-                      password=pbkdf2_sha256.hash(form.password.data)))
+                      password=pbkdf2_sha256.hash(form.password.data),
+                      roles=[Role.query.filter_by(name=form.role.data).first(),]))
     db.session.commit()
     flash('Congratulations, you are now a registered user!')
     return redirect(url_for('login'))

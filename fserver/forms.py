@@ -1,6 +1,6 @@
 
 from flask_wtf import FlaskForm, Form
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, RadioField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 
 from models import User
@@ -15,6 +15,7 @@ class LoginForm(FlaskForm):
 
 class RegistrationForm(FlaskForm):
   """ Registration Form  """
+  role = RadioField('User Type', choices=[('user','user role'),('driver','driver role')])
   username = StringField('Username', validators=[DataRequired()])
   email = StringField('Email', validators=[DataRequired(), Email()])
   password = PasswordField('Password', validators=[DataRequired()])
@@ -70,7 +71,7 @@ class RideRequestForm(FlaskForm):
     #   self.startLocation.errors.append('Origin cannot match destination')
     #   self.endLocation.error.append('Destination cannot match origin')
     #   return False
-    
+
     # Passed validation
     self.startLocation = origin_validator.address
     self.endLocation = dest_validator.address
