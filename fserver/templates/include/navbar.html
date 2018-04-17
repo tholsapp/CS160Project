@@ -17,7 +17,8 @@
 		<div class="collapse navbar-collapse navbar-right" id="myNavbar">
 			<ul class="nav navbar-nav">
 				{% if current_user.is_authenticated %}
-				<li><a href="{{ url_for('user_dashboard', user=current_user) }}">Your-Dashboard</a></li>
+				<li><a href="{{ url_for('user_dashboard', user=current_user) }}">Your-Dashboard</a></li>			
+				<li><a href="{{ url_for('driver_dashboard', driver=current_user) }}">Driver-Dashboard</a></li>
 				<li><a href="{{ url_for('logout') }}">Logout</a></li>
 				<li><a href="{{ url_for('about') }}">About</a></li>
 				{% else %}
