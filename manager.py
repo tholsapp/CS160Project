@@ -1,3 +1,4 @@
+
 from flask_script import Manager
 
 from fserver import app, init_app, init_db
