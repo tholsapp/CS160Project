@@ -8,8 +8,13 @@
 <h1>Hi, {{ current_user.username }}!</h1>
 
     <h1>Request A Ride</h1>
+    <h2>To Airport</h2>
     <form action="" method="post">
         {{ form.hidden_tag() }}
+        <p>
+
+        <input type="button" id="b1" value="interchange">
+        </p>
         <p>
             {{ form.startLocation.label }}<br>
             {{ form.startLocation(size=32) }}<br>
@@ -18,39 +23,52 @@
             {% endfor %}
         </p>
         <p>
-            {{ form.endLocation.label }}<br>
-            {{ form.endLocation(size=32) }}<br>
+            {{ form.endLocation.label }} <br>
+            {{ form.endLocation }}
             {% for error in form.endLocation.errors %}
-            	<span style="color: red;">[{{ error }}]</span>
+                <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
         <p>{{ form.submit() }}</p>
-    </form>
+</form>
 
-<script>
 
-var map
+<h2>From Airport</h2>
+<form action="" method="post">
+        {{ oform.hidden_tag() }}
+        <p>
+
+        <input type="button" id="b1" value="interchange">
+        </p>
+        <p>
+            {{ oform.startLocation.label }} <br>
+            {{ oform.endLocation }}
+            {% for error in oform.endLocation.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ oform.endLocation.label }}<br>
+            {{ oform.startLocation(size=32) }}<br>
+            {% for error in oform.startLocation.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ oform.submit() }}</p>
+</form>
+
+
+
+<script>    
+
 
 var sjc = {lat: 37.357944, lng: -121.897087};
 var sfo = {lat: 37.6213129, lng: -122.3789554};
 var oak = {lat: 37.7125689, lng: -122.2197428};
 
 
-function initMap() {
-	directionsService = new google.maps.DirectionsService;
-	directionsDisplay = new google.maps.DirectionsRenderer;
-
-	map = new google.maps.Map(document.getElementById('map'), {
-		zoom: 7,
-		center: sjc,
-		myTypeId: google.maps.MapTypeId.ROADMAP
-	});
-	directionsDisplay.setMap(map);
-}
 
 </script>
 
-<script async defer
-     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyASh_MzDRPXhWA2VlhANyBA5cPYJcOyOA4&libraries=geometry&libraries=places&callback=initMap">
-</script>
+
 {% endblock %}
