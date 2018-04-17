@@ -1,6 +1,6 @@
 
 from flask_wtf import FlaskForm, Form
-from wtforms import StringField, RadioField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, RadioField, PasswordField, BooleanField, SelectField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 
 from models import User
@@ -45,8 +45,12 @@ class CreditCardForm(FlaskForm):
 
 class RideRequestForm(FlaskForm):
   """ Address Form """
+  # start location of request (defalut start location home)
   startLocation = StringField('Start Location', validators=[DataRequired()])
-  endLocation = StringField('End Location', validators=[DataRequired()])
+  # end location of request (default end location airports)
+  choices = [('San Jose Airport', 'San Jose Airport'),('San Francisco Airport', 'San Francisco Airport'),('Oakland Airport', 'Oakland Airport')]
+  endLocation = SelectField('End Location', choices=choices, validators=[DataRequired()])
+  # submit button
   submit = SubmitField('Request Ride')
 
   def validate(self):

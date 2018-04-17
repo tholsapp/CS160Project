@@ -15,7 +15,6 @@ from passlib.hash import bcrypt
 from fserver import app, login_manager, db
 from models import User, Role
 from forms import LoginForm, RegistrationForm, RideRequestForm
-#from directions import Directions
 
 
 # Create a permission with a single Need, in this case a RoleNeed.
@@ -41,11 +40,19 @@ def about():
 @user_permission.require()
 def user_dashboard(user):
   """  """
-  form = RideRequestForm()
-  if form.validate_on_submit():
+  form1 = RideRequestForm(prefix="form1") # from home to air port
+  form2 = RideRequestForm(prefix="form2") # from air port to home
+  if form1.validate_on_submit():
     flash('Congratualtions, you made a request')
-    return redirect(url_for('map',origin=form.startLocation,destination=form.endLocation))
-  return render_template('user_dashboard.html', form=form, user=user)
+    print 'form 1 called'
+    return redirect(url_for('map',origin=form1.startLocation,destination=form1.endLocation))
+  # swap origin, destination because of the way RideRequestForm is defined
+  if form2.validate_on_submit():
+    flash('Congratualtions, you made a request')
+    print 'for 2 called'
+    return redirect(url_for('map',origin=form2.endLocation,destination=form2.startLocation))
+  # before request
+  return render_template('user_dashboard.html', form=form1, oform=form2, user=user)
 
 
 @app.route('/driver_dashboard/<driver>')
