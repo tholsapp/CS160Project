@@ -5,6 +5,19 @@
     <h1>Register</h1>
     <form action="" method="post">
         {{ form.hidden_tag() }}
+
+        <p>
+            {{ form.role.label }}<br>
+            {% for choice in form.role %}
+            <tr>
+                <td> {{ choice }} </td>
+                <td> {{ choice.label }} </td>
+            </tr>
+            {% endfor %}
+            {% for error in form.role.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
         <p>
             {{ form.username.label }}<br>
             {{ form.username(size=32) }}<br>
