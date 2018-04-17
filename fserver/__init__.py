@@ -2,7 +2,7 @@ from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_security import Security, SQLAlchemyUserDatastore
-from flask_principal import Principal
+from flask_principal import Principal, Permission, RoleNeed
 from flask_restless import APIManager
 from flask_bootstrap import Bootstrap
 from passlib.hash import pbkdf2_sha256

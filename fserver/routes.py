@@ -13,7 +13,7 @@ from werkzeug.urls import url_parse
 from passlib.hash import bcrypt
 
 from fserver import app, login_manager, db
-from models import User
+from models import User, Role
 from forms import LoginForm, RegistrationForm, RideRequestForm
 #from directions import Directions
 
@@ -39,6 +39,25 @@ def about():
 #   return "<h1>Only Admins can view this page</h1>"
 
 
+@app.route('/user_dashboard/<user>', methods=['GET', 'POST'])
+@user_permission.require()
+def user_dashboard(user):
+  """  """
+  form = RideRequestForm()
+  if form.validate_on_submit():
+    flash('Congratualtions, you made a request')
+    return redirect(url_for('map',origin=form.startLocation,destination=form.endLocation))
+  return render_template('user_dashboard.html', form=form, user=user)
+
+
+@app.route('/driver_dashboard/<driver>')
+@driver_permission.require()
+def driver_dashboard(driver):
+  # if form.validate_on_submit():
+  #   flash('Congratualtions, you made a request')
+  #   return redirect(url_for('map',origin=form.startLocation,destination=form.endLocation))
+  return render_template('driver_dashboard.html', driver=driver)
+
 @app.route('/map', methods=['GET', 'POST'])
 def map():
   """  """
@@ -54,22 +73,6 @@ def request_ride():
     return redirect(url_for('home'))
   return redirect(url_for('home'))
 
-# @app.route('/dashboard')
-# @driver_permission.require()
-# def driver_dashboard():
-#   return "<h1>Only Drivers can view this page</h1>"
-
-
-@app.route('/dashboard/<user>', methods=['GET', 'POST'])
-@user_permission.require()
-def user_dashboard(user):
-  """  """
-  form = RideRequestForm()
-  if form.validate_on_submit():
-    #form.validate_start_address()
-    flash('Congratualtions, you made a request')
-    return redirect(url_for('map',origin=form.startLocation,destination=form.endLocation))
-  return render_template('user_dashboard.html', form=form, user=user)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -98,22 +101,28 @@ def login():
     # Login and validate the user.
     if user is not None and user.password is not None \
         and user.verify_password(form.password.data):
-      if current_user.is_authenticated:
-        flash('User is already logged in')
-        return render_template('login.html', title='Sign In', form=form)
-      flash('Logged in successfully.')
-      # update the database
-      #login_user(user,remember=form.remember_me.data)
       login_user(user, remember=False)
-      #current_user.authenticated = True
       session['user_id'] = current_user.id
       
       # Tell Flask-Principal the identity changed
       identity_changed.send(current_app._get_current_object(),
-                          identity=Identity(user.id))
+                          identity=Identity(user.id))   
+
+      # update the database
       db.session.add(current_user)
       db.session.commit()
-      return redirect(url_for('user_dashboard', user=current_user))
+
+      flash('Logged in successfully.')
+      for r in current_user.roles:
+        # check if user is a user
+        role = Role.query.filter_by(name='user').first()
+        if r == role:
+          return redirect(url_for('user_dashboard', user=current_user))
+
+        # check if user is a driver
+        role = Role.query.filter_by(name='driver').first()
+        if r == role:
+          return redirect(url_for('driver_dashboard', driver=current_user))
     else:
       flash('Invalid username or passowrd')
       return redirect(url_for('login'))
@@ -135,6 +144,7 @@ def logout():
   # Tell Flask-Principal the user is anonymous
   identity_changed.send(current_app._get_current_object(),
                       identity=AnonymousIdentity())
+
   return redirect('login')
 
 @login_manager.user_loader
