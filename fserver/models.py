@@ -56,6 +56,9 @@ class User(db.Model, UserMixin):
   def get_id(self):
     return self.id
 
+  def has_roles(self, *args):
+    return set(args).issubset({role.name for role in self.roles})
+
 class CreditCard(db.Model):
   """ Credit Card Model """
   id = db.Column(Integer(), primary_key=True)

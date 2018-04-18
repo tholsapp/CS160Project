@@ -6,58 +6,52 @@
 
 <h1> User Dashboard </h1>
 <h1>Hi, {{ current_user.username }}!</h1>
+<h1>Request A Ride</h1>
+<div id=rideForm>
+    <div id="toAirportForm">
+        <h2>To Airport</h2>
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.startLocation.label }}<br>
+                {{ form.startLocation(size=32) }}<br>
+                {% for error in form.startLocation.errors %}
+                	<span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.endLocation.label }} <br>
+                {{ form.endLocation }}
+                {% for error in form.endLocation.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>{{ form.submit() }}</p>
+        </form>
+    </div>
 
-    <h1>Request A Ride</h1>
-    <h2>To Airport</h2>
-    <form action="" method="post">
-        {{ form.hidden_tag() }}
-        <p>
-
-        <input type="button" id="b1" value="interchange">
-        </p>
-        <p>
-            {{ form.startLocation.label }}<br>
-            {{ form.startLocation(size=32) }}<br>
-            {% for error in form.startLocation.errors %}
-            	<span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.endLocation.label }} <br>
-            {{ form.endLocation }}
-            {% for error in form.endLocation.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>{{ form.submit() }}</p>
-</form>
-
-
-<h2>From Airport</h2>
-<form action="" method="post">
-        {{ oform.hidden_tag() }}
-        <p>
-
-        <input type="button" id="b1" value="interchange">
-        </p>
-        <p>
-            {{ oform.startLocation.label }} <br>
-            {{ oform.endLocation }}
-            {% for error in oform.endLocation.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ oform.endLocation.label }}<br>
-            {{ oform.startLocation(size=32) }}<br>
-            {% for error in oform.startLocation.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>{{ oform.submit() }}</p>
-</form>
-
-
+        <div id="fromAirportForm">
+        <h2>From Airport</h2>
+        <form action="" method="post">
+                {{ oform.hidden_tag() }}
+                <p>
+                    {{ oform.startLocation.label }} <br>
+                    {{ oform.endLocation }}
+                    {% for error in oform.endLocation.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </p>
+                <p>
+                    {{ oform.endLocation.label }}<br>
+                    {{ oform.startLocation(size=32) }}<br>
+                    {% for error in oform.startLocation.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </p>
+                <p>{{ oform.submit() }}</p>
+        </form>
+    </div>
+</div>
 
 <script>    
 
