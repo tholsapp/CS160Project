@@ -53,6 +53,22 @@
     </div>
 </div>
 
+<br><br>
+<h2>History of Transactions</h2>
+
+{% for r in rides %}
+  <tr>
+    <td>------------------------------------------------------------------------------------------------------------------------------------------------------</</td><br>
+    <td>id : {{ r.id }}</td><br>
+    <td>origin : {{ r.origin }}</td><br>
+    <td>destination : {{ r.destination }}</td><br>
+    <td>request time : {{ r.time_of_request }}</td><br>
+    <td>pickup time : {{ r.time_of_pickup }}</td><br>
+    <td>dropoff time : {{ r.time_of_dropoff }}</td><br>
+    <td>group ride : {{ r.group_ride }}</td><br>
+  </tr>
+{% endfor %}
+
 <script>    
 
 
