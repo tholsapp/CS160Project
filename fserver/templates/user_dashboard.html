@@ -21,7 +21,7 @@
             </p>
             <p>
                 {{ form.endLocation.label }} <br>
-                {{ form.endLocation }}
+                {{ form.endLocation }}<br>
                 {% for error in form.endLocation.errors %}
                     <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}
@@ -36,7 +36,7 @@
                 {{ oform.hidden_tag() }}
                 <p>
                     {{ oform.startLocation.label }} <br>
-                    {{ oform.endLocation }}
+                    {{ oform.endLocation }}<br>
                     {% for error in oform.endLocation.errors %}
                         <span style="color: red;">[{{ error }}]</span>
                     {% endfor %}
@@ -49,9 +49,32 @@
                     {% endfor %}
                 </p>
                 <p>{{ oform.submit() }}</p>
+
         </form>
     </div>
 </div>
+
+
+<div class="container">
+      <div class="col-sm-8">
+        <div class="no_message">
+          <h1 style='color: #ccc'>No message yet..</h1>
+          <div class="message_holder"></div>
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <form action="" method="POST" id="form1">
+          <b>Type your message below <span class="glyphicon glyphicon-arrow-down"></span></b>
+          <div class="clearfix" style="margin-top: 5px;"></div>
+          <input type="text" class="username form-control" placeholder="User Name">
+          <div style="padding-top: 5px;"></div>
+          <input type="text" class="message form-control" placeholder="Messages">
+          <div style="padding-top: 5px;"></div>
+          <button type="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-send"></span> Send</button>
+        </form>
+      </div>
+</div>
+
 
 <br><br>
 <h2>History of Transactions</h2>
@@ -60,6 +83,7 @@
   <tr>
     <td>------------------------------------------------------------------------------------------------------------------------------------------------------</</td><br>
     <td>id : {{ r.id }}</td><br>
+    <td>accepted : {{ r.accepted }}<br>
     <td>origin : {{ r.origin }}</td><br>
     <td>destination : {{ r.destination }}</td><br>
     <td>request time : {{ r.time_of_request }}</td><br>
@@ -71,11 +95,39 @@
 
 <script>    
 
+      var socket = io.connect( 'http://' + document.domain + ':' + location.port )
+
+      // broadcast a message (rideRequest)
+      socket.on( 'connect', function() {
+        socket.emit( 'my event', {
+          data: 'User Connected'
+        } )
+        var form = $( '#form1' ).on( 'submit', function( e ) {
+          e.preventDefault()
+          let user_name = $( 'input.username' ).val()
+          let user_input = $( 'input.message' ).val()
+          socket.emit( 'my event', {
+            user_name : user_name,
+            message : user_input
+          } )
+          // empty the input field
+          $( 'input.message' ).val( '' ).focus()
+        } )
+      } )
+
+      // capture message - redirect
+      socket.on( 'my response', function( msg ) {
+        console.log( msg )
+        if( typeof msg.user_name !== 'undefined' ) {
+          $( 'h1' ).remove()
+          $( 'div.message_holder' ).append( '<div class="msg_bbl"><b style="color: #000">'+msg.user_name+'</b> '+msg.message+'</div>' )
+        }
+      })
+
 
 var sjc = {lat: 37.357944, lng: -121.897087};
 var sfo = {lat: 37.6213129, lng: -122.3789554};
 var oak = {lat: 37.7125689, lng: -122.2197428};
-
 
 
 </script>

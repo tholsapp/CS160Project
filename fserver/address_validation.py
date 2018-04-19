@@ -3,7 +3,6 @@
 import requests
 
 class AddressValidator():
-
 	""" Helper class to validate addresses supplied by user 
 	Enforces address to be within counties (San Mateo, Santa Clara, Alameda """
 
@@ -11,9 +10,9 @@ class AddressValidator():
 	key = 'AIzaSyASh_MzDRPXhWA2VlhANyBA5cPYJcOyOA4'
 
 	def __init__(self):
-		self.address = None;
-		self.lat = None;
-		self.lng = None;
+		self.address = None
+		self.lat = None
+		self.lng = None
 
 
 	def is_valid_address(self, address):

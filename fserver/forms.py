@@ -1,6 +1,6 @@
 
 from flask_wtf import FlaskForm, Form
-from wtforms import StringField, RadioField, PasswordField, BooleanField, SelectField, SubmitField
+from wtforms import StringField, RadioField, PasswordField, BooleanField, SelectField, SubmitField, HiddenField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 
 from models import User
@@ -43,8 +43,15 @@ class CreditCardForm(FlaskForm):
   def validate_card(self, card, exp, csv, zipcode):
     return false
 
+class AcceptRideRequestForm(FlaskForm):
+  """ Accepts Ride Request Fomrs 
+      instantiated from driver """
+  request_id = HiddenField('request_id')
+  submit = SubmitField('Accept Ride Request')
+
 class RideRequestForm(FlaskForm):
-  """ Address Form """
+  """ Ride Request Form 
+      instantiated from user """
   # start location of request (defalut start location home)
   startLocation = StringField('Start Location', validators=[DataRequired()])
   # end location of request (default end location airports)
@@ -59,6 +66,7 @@ class RideRequestForm(FlaskForm):
     if not rv:
       return False
 
+    # Validate Addresses
     origin_validator = AddressValidator()
     # Check if not valid origin
     if not origin_validator.is_valid_address(self.startLocation.data):
@@ -71,14 +79,29 @@ class RideRequestForm(FlaskForm):
       self.endLocation.errors.append('Destination: Invalid Location')
       return False
 
-    # if self.startLocation.data == self.endLocation.data:
-    #   self.startLocation.errors.append('Origin cannot match destination')
-    #   self.endLocation.error.append('Destination cannot match origin')
-    #   return False
+    # check if origin and destination are the same
+    if origin_validator.address == dest_validator.address:
+      self.startLocation.errors.append('Origin cannot match destination')
+      self.endLocation.errors.append('Destination cannot match origin')
+      return False
 
-    # Passed validation
+
+    # check if there are logged in drivers
+    users = User.query.all()
+    drivers = []
+    for u in users:    
+      if u.has_roles('driver') and u.is_logged_in():
+        drivers.append(u)
+    if len(drivers) == 0:
+      self.startLocation.errors.append('There are no available drivers at this time')
+      self.endLocation.errors.append('There are no available drivers at this time')
+      return False
+
+    # If address validation passes, check for available drivers
     self.startLocation = origin_validator.address
     self.endLocation = dest_validator.address
+
+    # all vaidations passed
     return True
 
     

@@ -13,11 +13,14 @@ class RideRequest(db.Model):
   """ Ride Request """
   __tablename__ = 'ride_request'
   id = db.Column(db.Integer(), primary_key=True, unique=True)
+  accepted = db.Column(db.Boolean(), default=False)
   origin = db.Column(db.String(255))
   destination = db.Column(db.String(255))
   time_of_request = db.Column(db.DateTime())
   time_of_pickup = db.Column(db.DateTime())
   time_of_dropoff = db.Column(db.DateTime())
+  eta = db.Column(db.String(64))
+  distance = db.Column(db.String(64))
   group_ride = db.Column(db.Boolean(), default=False)
 
   def is_active_ride(self):
@@ -38,6 +41,8 @@ class Role(db.Model, RoleMixin):
   name = db.Column(db.String(80), unique=True)
   description = db.Column(db.String(255))
 
+  def __repr__(self):
+    return self.id
 
 class User(db.Model, UserMixin):
   """ User model """
@@ -46,6 +51,7 @@ class User(db.Model, UserMixin):
   email = db.Column(db.String(255), unique=True)
   username = db.Column(db.String(64), unique=True)
   password = db.Column(db.String(255))
+  logged_in = db.Column(db.Boolean(), default=False)
   last_login_at = db.Column(db.DateTime())
   current_login_at = db.Column(db.DateTime())
   last_login_ip = db.Column(db.String(100))
@@ -77,6 +83,9 @@ class User(db.Model, UserMixin):
 
   def has_roles(self, *args):
     return set(args).issubset({role.name for role in self.roles})
+
+  def is_logged_in(self):
+    return self.logged_in
 
 
 class RideRequestsUsers(db.Model):
