@@ -12,8 +12,9 @@ from flask_security.utils import verify_password, encrypt_password
 from werkzeug.urls import url_parse
 from passlib.hash import bcrypt
 
+from datetime import datetime
 from fserver import app, login_manager, db
-from models import User, Role
+from models import User, Role, RideRequest
 from forms import LoginForm, RegistrationForm, RideRequestForm
 
 
@@ -39,25 +40,43 @@ def about():
 @app.route('/user_dashboard/<user>', methods=['GET', 'POST'])
 @user_permission.require()
 def user_dashboard(user):
-  """  """
+  """ Where user sends a ride request """
   form1 = RideRequestForm(prefix="form1") # from home to air port
   form2 = RideRequestForm(prefix="form2") # from air port to home
   if form1.validate_on_submit():
-    flash('Congratualtions, you made a request')
-    print 'form 1 called'
+    datetime_now = datetime.now()
+    current_user.rides.append(RideRequest(
+      origin=form1.startLocation,
+      destination=form1.endLocation,
+      time_of_request=datetime_now,
+      time_of_pickup=datetime_now,
+      time_of_dropoff=datetime_now,
+      group_ride=False,
+      ))
+    db.session.commit()
+
     return redirect(url_for('map',origin=form1.startLocation,destination=form1.endLocation))
   # swap origin, destination because of the way RideRequestForm is defined
   if form2.validate_on_submit():
-    flash('Congratualtions, you made a request')
-    print 'for 2 called'
+    datetime_now = datetime.now()
+    current_user.rides.append(RideRequest(
+      origin=form2.startLocation,
+      destination=form2.endLocation,
+      time_of_request=datetime_now,
+      time_of_pickup=datetime_now,
+      time_of_dropoff=datetime_now,
+      group_ride=False,
+      ))
+    db.session.commit()
     return redirect(url_for('map',origin=form2.endLocation,destination=form2.startLocation))
   # before request
-  return render_template('user_dashboard.html', form=form1, oform=form2, user=user)
+  return render_template('user_dashboard.html', form=form1, oform=form2, user=user, rides=current_user.rides)
 
 
 @app.route('/driver_dashboard/<driver>')
 @driver_permission.require()
 def driver_dashboard(driver):
+  """ Display the requested rides where driver can accept """
   # if form.validate_on_submit():
   #   flash('Congratualtions, you made a request')
   #   return redirect(url_for('map',origin=form.startLocation,destination=form.endLocation))
