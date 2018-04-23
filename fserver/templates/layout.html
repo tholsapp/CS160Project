@@ -8,6 +8,11 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<!-- JQuery Library -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+
+
 		<!--  Bootstrap Minified CSS -->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 		<!-- JavaScript Library -->
@@ -15,12 +20,12 @@
 		<!-- Include Styling -->
 		<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-
 		{% if title %}
 		<title>{{ title }} - Let it Fly</title>
 		{% else %}
 		<title>Let it Fly</title>
 		{% endif %}
+
 	</head>
 	{% endblock %}
 

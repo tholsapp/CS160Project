@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -6,6 +7,8 @@ from flask_principal import Principal, Permission, RoleNeed
 from flask_restless import APIManager
 from flask_bootstrap import Bootstrap
 from passlib.hash import pbkdf2_sha256
+
+from flask_socketio import SocketIO
 
 from fserver.database import db, db_connection
 from fserver.models import User, Role
@@ -20,13 +23,16 @@ apimanager = APIManager()
 login_manager = LoginManager()
 # Initialize Flask-Principal
 principal_manager = Principal(app)
+# Setup SocketIO
+socketio = SocketIO(app)
+
 
 def init_app():
   """ Configure app """
   app.config['DEBUG'] = True
   app.config['THREADED'] = True
-  app.config['use_reloader'] = True
-  app.config['SECRET_KEY'] = 'super-secret'
+  app.config['USE_RELOADER'] = True
+  app.config['SECRET_KEY'] = 'abc'
   app.config['SQLALCHEMY_DATABASE_URI'] = db_connection()
   app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
   app.config['SECURITY_PASSWORD_SALT'] = ''
@@ -89,7 +95,8 @@ def init_db():
   if not User.query.filter_by(username='driver1').first():
     driver1 = User(username='driver1',
         email='driver1@gmail.com',
-        password=pbkdf2_sha256.hash('password')
+        password=pbkdf2_sha256.hash('password'),
+        location='500 El Camino Real, Santa Clara, CA 95053',
         )
     driver1.roles = [driver_role,]
     db.session.add(driver1)
@@ -97,7 +104,8 @@ def init_db():
   if not User.query.filter_by(username='driver2').first():
     driver2 = User(username='driver2',
         email='driver2@gmail.com',
-        password=pbkdf2_sha256.hash('password')
+        password=pbkdf2_sha256.hash('password'),
+        location='1 Washington Sq, San Jose, CA 95192',
         )
     driver2.roles = [driver_role,]
     db.session.add(driver2)
