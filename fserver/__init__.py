@@ -95,7 +95,8 @@ def init_db():
   if not User.query.filter_by(username='driver1').first():
     driver1 = User(username='driver1',
         email='driver1@gmail.com',
-        password=pbkdf2_sha256.hash('password')
+        password=pbkdf2_sha256.hash('password'),
+        location='500 El Camino Real, Santa Clara, CA 95053',
         )
     driver1.roles = [driver_role,]
     db.session.add(driver1)
@@ -103,7 +104,8 @@ def init_db():
   if not User.query.filter_by(username='driver2').first():
     driver2 = User(username='driver2',
         email='driver2@gmail.com',
-        password=pbkdf2_sha256.hash('password')
+        password=pbkdf2_sha256.hash('password'),
+        location='1 Washington Sq, San Jose, CA 95192',
         )
     driver2.roles = [driver_role,]
     db.session.add(driver2)

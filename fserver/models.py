@@ -14,6 +14,7 @@ class RideRequest(db.Model):
   __tablename__ = 'ride_request'
   id = db.Column(db.Integer(), primary_key=True, unique=True)
   accepted = db.Column(db.Boolean(), default=False)
+  driver_origin = db.Column(db.String(255))
   origin = db.Column(db.String(255))
   destination = db.Column(db.String(255))
   time_of_request = db.Column(db.DateTime())
@@ -52,6 +53,7 @@ class User(db.Model, UserMixin):
   username = db.Column(db.String(64), unique=True)
   password = db.Column(db.String(255))
   logged_in = db.Column(db.Boolean(), default=False)
+  location = db.Column(db.String(255))
   last_login_at = db.Column(db.DateTime())
   current_login_at = db.Column(db.DateTime())
   last_login_ip = db.Column(db.String(100))

@@ -58,7 +58,8 @@ def user_dashboard(user):
       group_ride=False,
       ))
     db.session.commit()
-    return redirect(url_for('map',origin=form1.startLocation,destination=form1.endLocation))
+    return redirect(url_for('map', origin='',destination='',pickedup_flag=False))
+    #return redirect(url_for('map',origin=form1.startLocation,destination=form1.endLocation,pickedup_flag=False))
   # if airport to home is submitted
   if form2.validate_on_submit():
     datetime_now = datetime.now()
@@ -73,22 +74,8 @@ def user_dashboard(user):
       ))
     db.session.commit()
     # swap origin, destination because of the way RideRequestForm is defined
-    return redirect(url_for('map',origin=form2.endLocation,destination=form2.startLocation))
+    return redirect(url_for('map',origin=form2.endLocation,destination=form2.startLocation,pickedup_flag=False))
 
-  # test to check for logged in drivers
-  users = User.query.all()
-  print 'Listing users'
-  for u in users:
-    print 'All drivers'
-    if u.has_roles("driver"):
-      print u.username
-      print 'Logged in drivers'
-      if u.is_logged_in():
-        print u.username
-      else:
-        print 'None'
-    else:
-      print 'None'
   # before request
   return render_template('user_dashboard.html', form=form1, oform=form2, user=user, rides=current_user.rides)
 
@@ -121,37 +108,31 @@ def driver_dashboard(driver):
   form2 = AcceptRideRequestForm(prefix="form2")
 
   if form1.validate_on_submit():
-    print "form 1 works"
+    print "form 1 working..."
     request = RideRequest.query.get(form1.request_id.data)
     request.accepted = True
     db.session.commit()
-    print request
-    #return redirect(url_for('map',origin=form2.endLocation,destination=form2.startLocation))
+    driver_location = str(current_user.location)
+    return redirect(url_for('map', origin=request.origin, destination=request.destination, pickedup_flag='false'))
 
   if form2.validate_on_submit():
-    print "form 2 works"
+    print "form 2 working..."
     request = RideRequest.query.get(form2.request_id.data)
     request.accepted = True
     db.session.commit()
-    print request
-    # return redirect(url_for('driver_dashboard', driver=driver, users=users,
-    #   form1=form1, form2=form2))
+    return redirect(url_for('map', origin=request.origin, destination=request.destination, pickedup='false'))
 
-
-  # if form.validate_on_submit():
-  #   flash('Congratualtions, you made a request')
-  #   return redirect(url_for('map',origin=form.startLocation,destination=form.endLocation))
   return render_template('driver_dashboard.html', driver=driver, users=users, u1=user1, u2=user2,
     r1=user1_request, r2=user2_request, form1=form1, form2=form2)
 
-@app.route('/map', methods=['GET', 'POST'])
+@app.route('/map/', methods=['GET', 'POST'])
 def map():
   """ Displays the map and directions of origin and destination """
-  if request.method == 'GET':
-    origin = request.args['origin']
-    destination = request.args['destination']
-    return render_template('map.html', origin=origin,destination=destination)
-  return render_template('map.html')
+  origin = request.args['origin']
+  destination = request.args['destination']
+  pickedup_flag= request.args['pickedup_flag']
+  return render_template('map.html', origin=origin, destination=destination, pickedup='false')
+ 
 
 @app.route('/request-ride', methods=['GET', 'POST'])
 def request_ride():

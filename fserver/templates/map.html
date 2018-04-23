@@ -11,7 +11,7 @@
 var map;
 var directionsService;
 var markers = new Array();
-var speedFactor = 100; // 10x faster animated drive
+var speedFactor = 1000; // 10x faster animated drive
 
 var sjc = {lat: 37.357944, lng: -121.897087};
 var sfo = {lat: 37.6213129, lng: -122.3789554};
@@ -26,23 +26,24 @@ function initMap() {
 	map = new google.maps.Map(document.getElementById('map'),
 			mapOptions);
 	directionsService = new google.maps.DirectionsService();
-	// markerA = new google.maps.Marker({
-	// 	map: map,
-	// 	position: new google.maps.LatLng(42.3505, -71.1056)
-	// });
-	// markerB = new google.maps.Marker({
-	// 	map: map,
-	// 	position: new google.maps.LatLng(42.3405, -71.0756)
-	// });
-	calcRoute();
+
+	calcRoute({{ current_user.location|tojson|safe }},
+			  {{ origin|tojson|safe }},
+			  {{ destination|tojson|safe }},
+			  {{ pickedup }});
 }
 
-function calcRoute() {
+function calcRoute(driver_location, origin, destination, pickedup) {
 	var request = {
-		origin: '{{ origin }}',
-		destination: '{{ destination }}',
-		travelMode: google.maps.TravelMode.DRIVING
-	};
+			origin: origin,
+			destination: destination,
+			travelMode: google.maps.TravelMode.DRIVING
+		};
+	if(pickedup == false) {
+		request['origin'] = driver_location;
+		request['destination'] = origin;
+	}
+
 
 	directionsService.route(request, function(response, status) {
 		if (status == google.maps.DirectionsStatus.OK) {
@@ -52,8 +53,6 @@ function calcRoute() {
 				path: pathPoints,
 				geodesic: true
 			})
-
-			console.log(response.routes[0]);
 
 			var distance = google.maps.geometry.spherical.computeLength(pathPoints);
 			var duration = response.routes[0].legs[0].duration['value'];
@@ -70,7 +69,7 @@ function calcRoute() {
 				marker.setMap(null);
 				markers.push(marker);
 			});
-			startRouteAnimation();
+			startRouteAnimation(driver_location, origin, destination, pickedup);
 		}
 	});
 }
@@ -100,13 +99,24 @@ function getFineData(roughData, resolution) {
 
 
 // start the route simulation   
-function startRouteAnimation() {
+function startRouteAnimation(driver_location, origin, destination, pickedup) {
 	var autoDriveTimer = setInterval(function () {
 		// stop the timer if the route is finished
 		if (markers.length === 1) {
 			//clearInterval(autoDriveTimer);
-			window.location = "{{ url_for('home') }}"
-		} else {
+			if( pickedup == false) {
+				//window.location = "{{ url_for('map',origin=origin,destination=destination,pickedup='true') }}";
+				calcRoute(driver_location,
+						  origin,
+						  destination,
+						  pickedup=true
+						  );
+				}
+			else {
+				window.location = "{{ url_for('home') }}";
+			}
+		} 
+		else {
 			markers[1].setMap(map);
 			var temp = markers.shift();
 			map.setCenter(temp.position);
@@ -115,11 +125,11 @@ function startRouteAnimation() {
 	}, 1000);
 }
 
-
 </script>
 
 
 <script async defer
      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyASh_MzDRPXhWA2VlhANyBA5cPYJcOyOA4&libraries=geometry&libraries=places&callback=initMap">
 </script>
+
 {% endblock %}

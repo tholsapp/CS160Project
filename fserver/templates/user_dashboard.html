@@ -95,6 +95,8 @@
 
 <script>    
 
+      console.log("document domain " + document.domain);
+      console.log("location port " + location.port);
       var socket = io.connect( 'http://' + document.domain + ':' + location.port )
 
       // broadcast a message (rideRequest)
