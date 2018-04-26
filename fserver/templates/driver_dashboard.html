@@ -2,7 +2,9 @@
 {% extends "layout.html" %}
 
 {% block content %}
+<div class="page-header text-center">
 <h1> Driver Dashboard </h1>
+</div>
 <h1>Hi, {{ current_user.username }}!</h1>
 
 {% for r in request_forms %}

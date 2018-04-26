@@ -8,13 +8,26 @@
 
 <script>
 
+var map;
+var origin = {{ directions.origin|tojson|safe }};
+var destination = {{ directions.destination|tojson|safe }};
+var driver_location;
+var customer_location;
+var overview_path = {{ directions.overview_path|tojson|safe }}
+var total_duration = {{ directions.total_duration|tojson|safe }};
+
+console.log(overview_path)
+var driver_marker;
+
+var steps = {{ directions.steps|tojson|safe }};
+var points = new Array();
+
 var sjc = {lat: 37.357944, lng: -121.897087};
 var sfo = {lat: 37.6213129, lng: -122.3789554};
 var oak = {lat: 37.7125689, lng: -122.2197428};
 
 
 function initMap() {
-
 		// map options
 	var mapOptions = {
 		center: sjc,
@@ -25,7 +38,7 @@ function initMap() {
 	var map = new google.maps.Map(document.getElementById('map'), mapOptions);
 
 	var polyline = new google.maps.Polyline({
-		path : decode({{ ply1|tojson|safe }}),
+		path : decode(overview_path),
 		strokeColor: "#ff0000",  // you might want different colors per suggestion
 		strokeOpacity: 0.7,
 		strokeWeight: 3
@@ -37,60 +50,37 @@ function initMap() {
 	// customer marker
 	var cmarker = new google.maps.Marker({ map: map });
 
-	var total_time = {{ dir1.total_duration|tojson|safe }};
-	var num_steps = polyline.getPath().length;
-	var latlng = decode({{ ply1|tojson|safe }});
-	var flag = false;
-	console.log(latlng)
-
-	start_animation(map, polyline, dmarker, cmarker, total_time, num_steps, latlng);
+	start_animation(map, polyline, dmarker, cmarker);
 }
 
-function start_animation(map, path, dmarker, cmarker, total_time, num_steps, latlng, flag) {
+function start_animation(map, path, dmark, cmarker) {
 	var speed_factor = 10; // run 10x faster
 	var current_time = 0;
+	var total_time = {{ directions.total_duration|tojson|safe }};
+	var num_steps = path.getPath().length;
+	var latlng = decode(overview_path);
 	var frequency = total_time / num_steps;
 
 
-
-	dmarker.setPosition(latlng[0]);
+	console.log(latlng);
+	dmark.setPosition(latlng[0]);
 
 	//console.log(path.getPath().length);
 	//console.log(steps);
 	var autoDriveTimer = setInterval(function () {
 		// stop the timer if the route is finished
 		if (latlng.length == 0) {
-			clearInterval(autoDriveTimer);
-			if(!flag){
-				flag = true;
-				var polyline = new google.maps.Polyline({
-				path: decode({{ ply2|tojson|safe }}),
-					strokeColor: "#ff0000",  // you might want different colors per suggestion
-				strokeOpacity: 0.7,
-				strokeWeight: 3
-				});
-				polyline.setMap(map);
-
-				var total_time2 = {{ dir2.total_duration|tojson|safe }}
-				var num_steps2 = polyline.getPath().length;
-				var latlng2 = decode({{ ply2|tojson|safe }});
-
-				start_animation(map, polyline, dmarker, cmarker, total_time2, num_steps2, latlng2, flag);
-			}
-			else {
-				window.location.href = "{{url_for('home')}}";
-			}
-		}
+			
+		} 
 		else {
 			latlng.shift();
 			path.getPath().removeAt(0);
-			dmarker.setPosition(latlng[0]);
-			map.setCenter(dmarker.position);
+			dmark.setPosition(latlng[0]);
+			map.setCenter(dmark.position);
+			console.log(current_time);
 		}
 	current_time++;
 	}, 1000 * frequency / speed_factor);
-
-	
 }
 
 

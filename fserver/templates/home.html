@@ -2,12 +2,9 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h1>Hi, {{ current_user.username }}!</h1>
-    {% for post in posts %}
-    <div><p>{{ post.author.username }} says: <b>{{ post.body }}</b></p></div>
-    {% endfor %}
-
-    <h1> Let it Fly </h1>
+<div class="page-header text-center">
+<h1> LET IT FLY</h1>
+</div>
     <p> 
     	“Let It Fly” is a Bay Area Companany (San Mateo, Santa Clara, Alameda) that allows sub-contracted drivers to locate their next customer request to/from one of the 3 airports (SFO, OAK, SJC). Requires mapping, time based traffic events, and location based searches to guarantee the wait time to 30 minutes from the time of request.
     </p>

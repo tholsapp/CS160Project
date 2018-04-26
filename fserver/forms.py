@@ -1,7 +1,7 @@
 
 from flask_wtf import FlaskForm, Form
 from wtforms import StringField, RadioField, PasswordField, BooleanField, SelectField, SubmitField, HiddenField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
 
 from models import User
 from address_validation import AddressValidator
@@ -15,12 +15,23 @@ class LoginForm(FlaskForm):
 
 class RegistrationForm(FlaskForm):
   """ Registration Form  """
-  role = RadioField('User Type', choices=[('user','user role'),('driver','driver role')])
+  months = [('Jan', '01'),('Feb', '02'),('Mar', '03'),('Apr', '04'),('May', '05'),('Jun', '06'),('Jul', '07'),('Aug', '08'),('Sep', '09'),('Oct', '10'),('Nov', '11'),('Dec', '12')]
+  years = [('2018','2018'),('2019','2019'),('2020','2020'),('2021','2021'),('2022','2022'),('2023','2023'),('2024','2024'),('2025','2025'),('2026','2026')]
+
+  role = RadioField('User Type', choices=[('user','user role'),('driver','driver role')],default='user')
   username = StringField('Username', validators=[DataRequired()])
   email = StringField('Email', validators=[DataRequired(), Email()])
   password = PasswordField('Password', validators=[DataRequired()])
   password2 = PasswordField(
       'Repeat Password', validators=[DataRequired(), EqualTo('password')])
+  # Credit Card Information
+  card_number = StringField('Credit Card Number', validators=[DataRequired(),
+    Length(min=16,max=16,message='Credit Card number must be 16-digits')])
+  exp_month = SelectField('Experation Month', choices=months, validators=[DataRequired()], default='May')
+  exp_year = SelectField('Experation Year', choices=years, validators=[DataRequired()])
+  cvc = StringField('CVC', validators=[DataRequired()])
+  zipcode = StringField('Zipcode', validators=[DataRequired(),
+    Length(min=5,max=5,message='Invalid zipcode')])
   submit = SubmitField('Register')
 
   def validate_username(self, username):
@@ -33,15 +44,6 @@ class RegistrationForm(FlaskForm):
     if user is not None:
       raise ValidationError('Please use a different email address.')
 
-class CreditCardForm(FlaskForm):
-  """ Credit Card Form """
-  card = StringField('Card Number', validators=[DataRequired()])
-  exp = StringField('Expiration Date', validators=[DataRequired()])
-  cvc = StringField('CVC', validators=[DataRequired()])
-  zipcode = StringField('Zipcode', validators=[DataRequired()])
-
-  def validate_card(self, card, exp, csv, zipcode):
-    return false
 
 class AcceptRideRequestForm(FlaskForm):
   """ Accepts Ride Request Fomrs 

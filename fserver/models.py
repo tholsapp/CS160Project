@@ -13,10 +13,13 @@ class RideRequest(db.Model):
   """ Ride Request """
   __tablename__ = 'ride_request'
   id = db.Column(db.Integer(), primary_key=True, unique=True)
+  user_id = db.Column(db.String(64))
+  driver_id = db.Column(db.String(64))
   accepted = db.Column(db.Boolean(), default=False)
+  is_active = db.Column(db.Boolean(), default=True)
   driver_origin = db.Column(db.String(255))
-  origin = db.Column(db.String(255))
-  destination = db.Column(db.String(255))
+  user_origin = db.Column(db.String(255))
+  user_destination = db.Column(db.String(255))
   time_of_request = db.Column(db.DateTime())
   time_of_pickup = db.Column(db.DateTime())
   time_of_dropoff = db.Column(db.DateTime())
@@ -60,6 +63,12 @@ class User(db.Model, UserMixin):
   current_login_ip = db.Column(db.String(100))
   login_count = db.Column(db.Integer())
   confirmed_at = db.Column(db.DateTime())
+  # credit card info 
+  card_number = db.Column(db.String(16))
+  exp = db.Column(db.String(7))
+  cvc = db.Column(db.String(5))
+  zipcode = db.Column(db.String(5))
+  # relationships
   roles = db.relationship('Role', secondary='roles_users',
                       backref=backref('user', lazy='dynamic'))
   rides = db.relationship('RideRequest', secondary='ride_request_users',
@@ -98,6 +107,12 @@ class RideRequestsUsers(db.Model):
   request_id = db.Column('request_id', db.Integer(), db.ForeignKey('ride_request.id'))
 
 
+class Zipcode(db.Model):
+  __tablename__ = 'zipcode'
+  id = db.Column(db.Integer(), primary_key=True, unique=True)
+  zipcode = db.Column('zipcode', db.String(5))
+  county = db.Column('county', db.String(64))
+
 class RolesUsers(db.Model):
   """ Model """
   __tablename__ = 'roles_users'
@@ -105,20 +120,5 @@ class RolesUsers(db.Model):
   user_id = db.Column('user_id', db.Integer(), db.ForeignKey('user.id'))
   role_id = db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
 
-
-class CreditCard(db.Model):
-  """ Credit Card Model """
-  id = db.Column(Integer(), primary_key=True)
-  __tablename__ = 'creditcard'
-  card_number = db.Column(db.String(16))
-  exp = db.Column(db.String(4))
-  cvc = db.Column(db.String(5))
-  zipcode = db.Column(db.String(5))
-
-
-class ZipCode(db.Model):
-  __tablename__ = 'zipcode'
-  id = db.Column(db.Integer, primary_key=True, unique=True)
-  zipcode = db.Column(db.String(5), unique=True)
 
 
