@@ -5,7 +5,6 @@
 <div class="page-header text-center">
 <h1> Driver Dashboard </h1>
 </div>
-<h1>Hi, {{ current_user.username }}!</h1>
 
 {% for r in request_forms %}
 	<p>{{ r.submit() }}</p>
@@ -17,10 +16,9 @@
 		{% for r in r1 %}
 			{% if r.accepted and not r.is_valid %}
 				<p>REQUEST ID: {{ r.id }}</p>
-				<p>TIME OF REQUEST : {{ r.time_of_request }}</p>
-				<p>PICKED UP : {{ r.accepted }}</p>
-				<p>ORIGN : {{ r.origin }}</p>
-				<p>DESTINATION : {{ r.destination }}</p>
+				<p>TIME OF REQUEST : {{ r.time_of_request.now().time() }}</p>
+				<p>ORIGN : {{ r.user_origin }}</p>
+				<p>DESTINATION : {{ r.user_destination }}</p>
 				{{ form1.request_id(value=r.id) }}
 	    	{% endif %}
 	    {% endfor %}
@@ -35,10 +33,9 @@
 		{% for r in r2 %}
 			{% if r.accepted and not r.is_valid  %}
 				<p>REQUEST ID: {{ r.id }}</p>
-				<p>TIME OF REQUEST : {{ r.time_of_request }}</p>
-				<p>PICKED UP : {{ r.accepted }}</p>
-				<p>ORIGIN : {{ r.origin }}</p>
-				<p>DESTINATION : {{ r.destination }}</p>
+				<p>TIME OF REQUEST : {{ r.time_of_request.time() }}</p>
+				<p>ORIGIN : {{ r.user_origin }}</p>
+				<p>DESTINATION : {{ r.user_destination }}</p>
 				{{ form2.request_id(value=r.id) }}
 	    	{% endif %}
 	    {% endfor %}
