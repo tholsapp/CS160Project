@@ -12,8 +12,7 @@ from flask_security.utils import verify_password, encrypt_password
 from werkzeug.urls import url_parse
 from passlib.hash import bcrypt
 
-
-from datetime import datetime
+from datetime import datetime, timedelta
 from fserver import app, login_manager, db
 from models import User, Role, RideRequest
 from forms import LoginForm, RegistrationForm, RideRequestForm, AcceptRideRequestForm
@@ -97,7 +96,7 @@ def accept_ride():
     for rrequest in current_user.rides:
       if rrequest.accepted and not rrequest.is_active:
         flash("A Driver has not accepted your request yet")
-        return render_template('accept_ride.html', form=form, rides=current_user.rides)
+        return render_template('accept_ride.html', form=form, rides=current_user.rides, price=price)
       if rrequest.accepted and rrequest.is_active:
         request_id = rrequest.id
         break
@@ -152,15 +151,16 @@ def driver_dashboard(driver):
     request = RideRequest.query.get(form1.request_id.data)
     request.driver_id = current_user.id
     request.driver_origin = current_user.location
-    request.time_of_pickup = datetime.now()
     request.accepted = True
     request.is_active = True
     current_user.location = request.user_destination
-    db.session.commit()
+    
 
     dir1 = GMapDirectionService(request.driver_origin, request.user_origin)
     dir2 = GMapDirectionService(request.user_origin, request.user_destination)
-
+    request.time_of_pickup = datetime.now() + timedelta(seconds=dir1.total_duration);
+    request.time_of_dropoff = datetime.now() + timedelta(seconds=dir1.total_duration) + timedelta(seconds=dir2.total_duration)  
+    db.session.commit()
     return render_template('map.html', userid=current_user.id,
           uid=request.user_id, did=request.driver_id,
           dir1=dir1, dir2=dir2,
