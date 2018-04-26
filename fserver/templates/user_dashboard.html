@@ -4,11 +4,19 @@
 
 {% block content %}
 
+<div class="page-header text-center">
 <h1> User Dashboard </h1>
+</div>
 <h1>Hi, {{ current_user.username }}!</h1>
-<h1>Request A Ride</h1>
-<div id=rideForm>
-    <div id="toAirportForm">
+     
+
+      <div class="container">
+        <div class="text_center">
+        <h1> Request A Ride : </h1>
+        </div>
+
+        <div class="col-sm-4">
+        {% if form %}
         <h2>To Airport</h2>
         <form action="" method="post">
             {{ form.hidden_tag() }}
@@ -27,10 +35,12 @@
                 {% endfor %}
             </p>
             <p>{{ form.submit() }}</p>
-        </form>
-    </div>
+        </form>  
+        {% endif %}
+        </div>
 
-        <div id="fromAirportForm">
+        <div class="col-sm-6">
+        {% if oform  %}
         <h2>From Airport</h2>
         <form action="" method="post">
                 {{ oform.hidden_tag() }}
@@ -51,80 +61,47 @@
                 <p>{{ oform.submit() }}</p>
 
         </form>
-    </div>
-</div>
+        {% endif %}
 
-
-<div class="container">
-      <div class="col-sm-8">
-        <div class="no_message">
-          <h1 style='color: #ccc'>No message yet..</h1>
-          <div class="message_holder"></div>
         </div>
-      </div>
-      <div class="col-sm-4">
-        <form action="" method="POST" id="form1">
-          <b>Type your message below <span class="glyphicon glyphicon-arrow-down"></span></b>
-          <div class="clearfix" style="margin-top: 5px;"></div>
-          <input type="text" class="username form-control" placeholder="User Name">
-          <div style="padding-top: 5px;"></div>
-          <input type="text" class="message form-control" placeholder="Messages">
-          <div style="padding-top: 5px;"></div>
-          <button type="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-send"></span> Send</button>
-        </form>
-      </div>
-</div>
+        <div>
+          {% if not form %}
+          <h2>Proceed to Map</h2>
+          <form action="" method="post">
+                  <p>{{ aform.submit() }}</p>
+          </form><br>
+          {% endif %}
+
+        </div>
+        </div>
 
 
 <br><br>
 <h2>History of Transactions</h2>
 
-{% for r in rides %}
-  <tr>
-    <td>------------------------------------------------------------------------------------------------------------------------------------------------------</</td><br>
-    <td>id : {{ r.id }}</td><br>
-    <td>accepted : {{ r.accepted }}<br>
-    <td>origin : {{ r.origin }}</td><br>
-    <td>destination : {{ r.destination }}</td><br>
-    <td>request time : {{ r.time_of_request }}</td><br>
-    <td>pickup time : {{ r.time_of_pickup }}</td><br>
-    <td>dropoff time : {{ r.time_of_dropoff }}</td><br>
-    <td>group ride : {{ r.group_ride }}</td><br>
-  </tr>
-{% endfor %}
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">REQUEST</th>
+      <th scope="col">ACCEPTED</th>
+      <th scope="col">ORIGIN</th>
+      <th scope="col">DESTINATION</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in rides %}
+    <tr>
+      <th scope="row">{{r.id }}</th>
+      <td>{{ r.accepted }}</td>
+      <td>{{ r.user_origin }}</td>
+      <td>{{ r.user_destination }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
 <script>    
-
-      console.log("document domain " + document.domain);
-      console.log("location port " + location.port);
-      var socket = io.connect( 'http://' + document.domain + ':' + location.port )
-
-      // broadcast a message (rideRequest)
-      socket.on( 'connect', function() {
-        socket.emit( 'my event', {
-          data: 'User Connected'
-        } )
-        var form = $( '#form1' ).on( 'submit', function( e ) {
-          e.preventDefault()
-          let user_name = $( 'input.username' ).val()
-          let user_input = $( 'input.message' ).val()
-          socket.emit( 'my event', {
-            user_name : user_name,
-            message : user_input
-          } )
-          // empty the input field
-          $( 'input.message' ).val( '' ).focus()
-        } )
-      } )
-
-      // capture message - redirect
-      socket.on( 'my response', function( msg ) {
-        console.log( msg )
-        if( typeof msg.user_name !== 'undefined' ) {
-          $( 'h1' ).remove()
-          $( 'div.message_holder' ).append( '<div class="msg_bbl"><b style="color: #000">'+msg.user_name+'</b> '+msg.message+'</div>' )
-        }
-      })
 
 
 var sjc = {lat: 37.357944, lng: -121.897087};

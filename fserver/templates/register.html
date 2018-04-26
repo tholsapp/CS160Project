@@ -2,50 +2,93 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    <h1>Register</h1>
-    <form action="" method="post">
-        {{ form.hidden_tag() }}
+<div class="page-header text-center">
+<h1> REGISTER - NEW USER</h1>
+</div>
 
-        <p>
-            {{ form.role.label }}<br>
-            {% for choice in form.role %}
-            <tr>
-                <td> {{ choice }} </td>
-                <td> {{ choice.label }} </td>
-            </tr>
-            {% endfor %}
-            {% for error in form.role.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.username.label }}<br>
-            {{ form.username(size=32) }}<br>
-            {% for error in form.username.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.email.label }}<br>
-            {{ form.email(size=32) }}<br>
-            {% for error in form.email.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.password.label }}<br>
-            {{ form.password(size=32) }}<br>
-            {% for error in form.password.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.password2.label }}<br>
-            {{ form.password2(size=32) }}<br>
-            {% for error in form.password2.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>{{ form.submit() }}</p>
+
+<div class="container-fluid">
+    <form action="" method="post">
+        <div class="row">
+            <div class="col-xs-6">
+                <h2> User Information </h2>
+                {{ form.hidden_tag() }}
+                <p>
+                    {{ form.role.label }}<br>
+                    {% for choice in form.role %}
+                    <tr>
+                        <td> {{ choice }} </td>
+                        <td> {{ choice.label }} </td>
+                    </tr>
+                    {% endfor %}
+                    {% for error in form.role.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </p>
+                <p>
+                    {{ form.username.label }}<br>
+                    {{ form.username(size=32) }}<br>
+                    {% for error in form.username.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </p>
+                <p>
+                    {{ form.email.label }}<br>
+                    {{ form.email(size=32) }}<br>
+                    {% for error in form.email.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </p>
+                <p>
+                    {{ form.password.label }}<br>
+                    {{ form.password(size=32) }}<br>
+                    {% for error in form.password.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </p>
+                <p>
+                    {{ form.password2.label }}<br>
+                    {{ form.password2(size=32) }}<br>
+                    {% for error in form.password2.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </p>
+                
+            </div>
+
+            <div class="col-xs-6">
+                <h2>Credit Card Information</h2>
+                <p>
+                    {{ form.card_number.lablel }}
+                    {{ form.card_number(size=32) }}<br>
+                    {% for error in form.card_number.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </p>
+                <p>
+                    <strong>Experation Date :</strong>
+                    {{ form.exp_month}} 
+                    {{ form.exp_year }}<br>
+                    {% for error in form.exp_month.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                    {% for error in form.exp_year.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </p>
+                <p>
+                    {{ form.zipcode.label }} {{ form.zipcode(size=10) }}
+                    {{ form.cvc.label }} {{ form.cvc(size=5) }}<br>
+                    {% for error in form.zipcode.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                    {% for error in form.cvc.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                    </p>
+                    <p>{{ form.submit() }}</p>
+            </div>
+        </div>
     </form>
+</div>
 {% endblock %}
