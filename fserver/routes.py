@@ -12,7 +12,6 @@ from flask_security.utils import verify_password, encrypt_password
 from werkzeug.urls import url_parse
 from passlib.hash import bcrypt
 
-from flask_socketio import emit
 
 from datetime import datetime
 from fserver import app, login_manager, db
