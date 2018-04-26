@@ -4,14 +4,18 @@ import requests
 class GMapDirectionService:
 
 	def __init__(self, origin, destination):
-		self.json_directions_response = self.make_directions_request(origin, destination)
-		print self.json_directions_response
-		self.origin = origin
-		self.destination = destination
-		self.overview_path = self.json_directions_response['routes'][0]['overview_polyline']['points']
-		self.total_polylines = self.get_polylines(self.json_directions_response)
-		self.total_duration = self.json_directions_response['routes'][0]['legs'][0]['duration']['value'];
-		self.steps =  self.get_steps(self.json_directions_response)
+		try:
+			self.json_directions_response = self.make_directions_request(origin, destination)
+			self.origin = origin
+			self.destination = destination
+			self.overview_path = self.json_directions_response['routes'][0]['overview_polyline']['points']
+			self.total_polylines = self.get_polylines(self.json_directions_response)
+			self.total_duration = self.json_directions_response['routes'][0]['legs'][0]['duration']['value'];
+			self.total_distance = self.json_directions_response['routes'][0]['legs'][0]['distance']['value']* 0.000621371192237
+			self.steps =  self.get_steps(self.json_directions_response)
+		except Exception as e:
+			pass
+		
 
 	def make_directions_request(self, origin, destination):
 		url = 'https://maps.googleapis.com/maps/api/directions/json'
@@ -52,6 +56,10 @@ class GMapDirectionService:
 
 
 if __name__ == '__main__':
-	obj = GMapDirectionService('1 Washington Sq, San Jose, CA 95192', '576 s. 5th st., san jose, ca 95112')
+	""" test functionality """
+	obj = GMapDirectionService('11701 Airport Blvd, San Jose, CA 95110', '576 s. 5th st., san jose, ca 95112')
+	print obj.total_distance
 	print obj.total_duration
 	print obj.overview_path
+
+

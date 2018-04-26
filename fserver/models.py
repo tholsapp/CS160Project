@@ -24,6 +24,7 @@ class RideRequest(db.Model):
   time_of_pickup = db.Column(db.DateTime())
   time_of_dropoff = db.Column(db.DateTime())
   eta = db.Column(db.String(64))
+  price = db.Column(db.String(64))
   distance = db.Column(db.String(64))
   group_ride = db.Column(db.Boolean(), default=False)
 

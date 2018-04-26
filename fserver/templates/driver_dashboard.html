@@ -15,7 +15,7 @@
 	{% if u1 %}
 		<p>USERNAME : {{ u1.username }}</p>
 		{% for r in r1 %}
-			{% if not r.accepted %}
+			{% if r.accepted and not r.is_valid %}
 				<p>REQUEST ID: {{ r.id }}</p>
 				<p>TIME OF REQUEST : {{ r.time_of_request }}</p>
 				<p>PICKED UP : {{ r.accepted }}</p>
@@ -33,7 +33,7 @@
 	{% if u2 %}
 		<p>USERNAME : {{ u2.username }}</p>
 		{% for r in r2 %}
-			{% if not r.accepted %}
+			{% if r.accepted and not r.is_valid  %}
 				<p>REQUEST ID: {{ r.id }}</p>
 				<p>TIME OF REQUEST : {{ r.time_of_request }}</p>
 				<p>PICKED UP : {{ r.accepted }}</p>
