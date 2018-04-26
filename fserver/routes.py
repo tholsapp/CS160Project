@@ -44,41 +44,42 @@ def user_dashboard(user):
   # if home to airport is submitted
   if form1.validate_on_submit():
     directions = GMapDirectionService(form1.startLocation, form1.endLocation)
-
+    price =  15 + (directions.total_distance / (directions.total_duration)) + (0.05 * directions.total_duration)
     datetime_now = datetime.now()
     current_user.rides.append(RideRequest(
       user_id=current_user.id,
-      accepted=False,
+      accepted=True,
+      is_active=False,
       user_origin=form1.startLocation,
       user_destination=form1.endLocation,
+      price=str("%.2f" % price),
       time_of_request=datetime_now,
       time_of_pickup=datetime_now,
       time_of_dropoff=datetime_now,
       group_ride=False,
       ))
     db.session.commit()
-
-    return redirect(url_for('accept_ride', rides=current_user.rides))
+    return redirect(url_for('accept_ride', rides=current_user.rides, price=str("%.2f" % price)))
 
   # if airport to home is submitted
   if form2.validate_on_submit():
+    directions = GMapDirectionService(form2.endLocation, form2.startLocation)
+    price =  15 + (directions.total_distance / (directions.total_duration)) + (0.05 * directions.total_duration)
     datetime_now = datetime.now()
     current_user.rides.append(RideRequest(
       user_id=current_user.id,
-      accepted=False,
-      is_active=True,
+      accepted=True,
+      is_active=False,
       user_origin=form2.endLocation,
       user_destination=form2.startLocation,
+      price=str("%.2f" % price),
       time_of_request=datetime_now,
       time_of_pickup=datetime_now,
       time_of_dropoff=datetime_now,
       group_ride=False,
       ))
     db.session.commit()
-    # swap origin, destination because of the way RideRequestForm is defined
-    #return redirect(url_for('map',origin=form2.endLocation,destination=form2.startLocation,pickedup_flag=False))
-    return redirect(url_for('accept_ride', rides=current_user.rides))
-
+    return redirect(url_for('accept_ride', rides=current_user.rides, price=str("%.2f" % price)))
   # before request
   return render_template('user_dashboard.html', form=form1, oform=form2, aform=None, rides=current_user.rides)
 
@@ -86,27 +87,27 @@ def user_dashboard(user):
 @app.route('/accept_ride', methods=['GET','POST'])
 def accept_ride():
   form = AcceptRideRequestForm(prefix="form")
+  rides = request.args.get('rides')
+  price = request.args.get('price')
   # Displays after request has been made
-
   if request.method == "POST":
     print "form submitted"
     # get request id so we can look it up in the database
     request_id = 0
     for rrequest in current_user.rides:
-      print rrequest
-      print rrequest.accepted
-      print rrequest.is_active
+      if rrequest.accepted and not rrequest.is_active:
+        flash("A Driver has not accepted your request yet")
+        return render_template('accept_ride.html', form=form, rides=current_user.rides)
       if rrequest.accepted and rrequest.is_active:
         request_id = rrequest.id
         break
-    print("request id " + str(request_id))
+       
     # check that request_id was found
     if request_id != 0:
     # look up most current instance of ride request
       rrequest = RideRequest.query.get(request_id)   
       dir1 = GMapDirectionService(rrequest.driver_origin, rrequest.user_origin)
       dir2 = GMapDirectionService(rrequest.user_origin, rrequest.user_destination)
-
       rrequest.accepted = False
       rrequest.is_active = False
       db.session.commit()
@@ -118,13 +119,7 @@ def accept_ride():
         ply1=dir1.overview_path, ply2=dir2.overview_path,
         flag=rrequest.is_active)
 
-    else:  
-        flash("A Driver has not accepted your request yet")
-        return render_template('accept_ride.html', form=form, rides=current_user.rides)
-
-
-
-  return render_template('accept_ride.html',form=form)
+  return render_template('accept_ride.html',form=form, rides=current_user.rides, price=price)
 
 
 @app.route('/driver_dashboard/<driver>', methods=['GET', 'POST'])
@@ -133,7 +128,7 @@ def driver_dashboard(driver):
   """ Display the requested rides where driver can accept """
 
   # get two customer requests
-  users = User.query.filter(User.rides.any(accepted=False)).limit(2)
+  users = User.query.filter(User.rides.any(accepted=True, is_active=False)).limit(2)
 
   try:
     user1 = users[0]
@@ -155,9 +150,12 @@ def driver_dashboard(driver):
 
   if form1.validate_on_submit():
     request = RideRequest.query.get(form1.request_id.data)
+    request.driver_id = current_user.id
+    request.driver_origin = current_user.location
+    request.time_of_pickup = datetime.now()
     request.accepted = True
     request.is_active = True
-    request.driver_origin = str(current_user.location)
+    current_user.location = request.user_destination
     db.session.commit()
 
     dir1 = GMapDirectionService(request.driver_origin, request.user_origin)
@@ -171,9 +169,14 @@ def driver_dashboard(driver):
           flag=request.is_active)
 
   if form2.validate_on_submit():
-    request = RideRequest.query.get(form2.request_id.data)
+    request = RideRequest.query.get(form2.request_id.data) 
+    request.driver_id = current_user.id
+    request.driver_origin = current_user.location
+    request.time_of_pickup = datetime.now()
     request.accepted = True
-    request.driver_origin = str(current_user.location)
+    request.accepted = True
+    request.is_active = True
+    current_user.location = request.user_destination
     db.session.commit();
 
     dir1 = GMapDirectionService(request.driver_origin, request.user_origin)

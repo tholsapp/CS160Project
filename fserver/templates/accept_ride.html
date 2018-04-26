@@ -7,23 +7,18 @@
 <div class="page-header text-center">
 <h1> User Dashboard </h1>
 </div>
-<h1>Hi, {{ current_user.username }}!</h1>
-     
 
-      <div class="container">
-        <div class="text_center">
-        <h1> Start your Ride : </h1>
-        </div>  
-
-        </div>
-        <div>
-          <h2>Proceed to Map</h2>
-          <form action="" method="post">
-                  <p>{{ form.submit() }}</p>
-          </form><br>
-
-        </div>
-        </div>
+<div class="container">
+  <div class="text_center">
+  <h1> Start your Ride : </h1> 
+  </div>  
+</div>
+<div>
+    <h2>Your total comes out to ${{ price }}</h2>
+    <form action="" method="post">
+        <p>{{ form.submit() }}</p>
+    </form><br>
+  </div>
 
 
 <br><br>
@@ -34,7 +29,7 @@
   <thead>
     <tr>
       <th scope="col">REQUEST</th>
-      <th scope="col">ACCEPTED</th>
+      <th scope="col">PRICE</th>
       <th scope="col">ORIGIN</th>
       <th scope="col">DESTINATION</th>
     </tr>
@@ -43,7 +38,7 @@
     {% for r in rides %}
     <tr>
       <th scope="row">{{r.id }}</th>
-      <td>{{ r.accepted }}</td>
+      <td>{{ r.price }}</td>
       <td>{{ r.user_origin }}</td>
       <td>{{ r.user_destination }}</td>
     </tr>

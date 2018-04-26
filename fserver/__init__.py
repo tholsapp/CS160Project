@@ -125,19 +125,14 @@ def init_db():
   zipcodes = data.zip_code.tolist()
   counties = data.county.tolist()
   
+  # adds the following zipcodes by county name
   for z,c in itertools.izip_longest(zipcodes,counties):
     if c == 'Santa Clara' or \
        c == 'San Mateo' or \
        c == 'Alameda':
         if not Zipcode.query.filter_by(zipcode=z).first():
           db.session.add(Zipcode(zipcode=z, county=c))
-
-
   db.session.commit()
-
-  x = Zipcode.query.all()
-  for y in x:
-    print y.zipcode
 
 """ Circular Import """
 import routes
