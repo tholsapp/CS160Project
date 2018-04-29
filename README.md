@@ -101,8 +101,8 @@ If not, change or make your new branch.
 
 To make a change simply change any file. In order to keep merges simple,
 be sure only change one feature at a time.
-### Adding you changes
-After you have modified a file, if you type in git status
+### Adding your changes
+After you have modified a file, if you type in `git status`
 ```bash
 git status
 On branch <branch>
@@ -138,7 +138,7 @@ This lists the file that is ready for the commit. To commit,
 ```bash
 git commit -m "<message>"
 ```
-Here, git commit will create a commit, -m is accept a command line argument message,
+Here, git commit will create a commit, `-m` is accept a command line argument message,
 the message should be concise and accurate.
 ### Creating a pull request
 Remember that you have just made these changes to you current branch, the actual code
