@@ -1,7 +1,7 @@
 
 from flask_wtf import FlaskForm, Form
 from wtforms import StringField, RadioField, PasswordField, BooleanField, SelectField, SubmitField, HiddenField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Regexp
 
 from models import User
 from address_validation import AddressValidator
@@ -26,12 +26,15 @@ class RegistrationForm(FlaskForm):
       'Repeat Password', validators=[DataRequired(), EqualTo('password')])
   # Credit Card Information
   card_number = StringField('Credit Card Number', validators=[DataRequired(),
-    Length(min=16,max=16,message='Credit Card number must be 16-digits')])
+    Length(min=16,max=16,message='Credit Card number must be 16-digits'),
+    Regexp(regex='[0-9]')])
   exp_month = SelectField('Experation Month', choices=months, validators=[DataRequired()], default='May')
   exp_year = SelectField('Experation Year', choices=years, validators=[DataRequired()])
-  cvc = StringField('CVC', validators=[DataRequired()])
+  cvc = StringField('CVC', validators=[DataRequired(),
+    Regexp(regex='[0-9]')])
   zipcode = StringField('Zipcode', validators=[DataRequired(),
-    Length(min=5,max=5,message='Invalid zipcode')])
+    Length(min=5,max=5,message='Invalid zipcode'),
+    Regexp(regex='[0-9]')])
   submit = SubmitField('Register')
 
   def validate_username(self, username):
