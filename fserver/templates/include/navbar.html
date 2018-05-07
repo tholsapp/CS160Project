@@ -14,7 +14,7 @@
 				<img src="static/image/SJSULogo.png" width="262" height="42" class="d-inline-block align-top" alt="">
 			</a>
 		</div>
-		<div class="collapse navbar-collapse navbar-right" id="myNavbar">
+		<div class="navbar-right" id="myNavbar">
 			<ul class="nav navbar-nav">
 				{% if current_user.is_authenticated %}
 					{% if current_user.has_roles('user') %}
@@ -24,11 +24,9 @@
 						<li><a href="{{ url_for('driver_dashboard', driver=current_user) }}">Driver-Dashboard</a></li>
 					{% endif %}
 					<li><a href="{{ url_for('logout') }}">Logout</a></li>
-					<li><a href="{{ url_for('about') }}">About</a></li>
 				{% else %}
 				<li><a href="{{ url_for('login') }}">Login</a></li>
 				<li><a href="{{ url_for('register') }}">Register</a></li>
-				<li><a href="{{ url_for('about') }}">About</a></li>
 				{% endif %}
 			</ul>
 		</div>
