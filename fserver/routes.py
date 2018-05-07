@@ -29,10 +29,6 @@ driver_permission = Permission(RoleNeed('driver'))
 def home():
   return render_template('home.html')
 
-@app.route('/about')
-def about():
-  return "about"
-
 @app.route('/user_dashboard/<user>', methods=['GET', 'POST'])
 @user_permission.require()
 def user_dashboard(user):
@@ -43,7 +39,7 @@ def user_dashboard(user):
   # if home to airport is submitted
   if form1.validate_on_submit():
     directions = GMapDirectionService(form1.startLocation, form1.endLocation)
-    price =  15 + (directions.total_distance / (directions.total_duration)) + (0.05 * directions.total_duration)
+    price =  15 + (directions.total_distance / (directions.total_duration)) + (0.05 * directions.total_duration - 2 )
     datetime_now = datetime.now()
     current_user.rides.append(RideRequest(
       user_id=current_user.id,
