@@ -57,7 +57,7 @@ class RegistrationForm(FlaskForm):
 
   def validate_exp_year(self, exp_year):
     now = datetime.now()
-    if now.year >= int(exp_year.data):
+    if now.year > int(exp_year.data):
       raise ValidationError('Expired Expiration Detected')
 
 
