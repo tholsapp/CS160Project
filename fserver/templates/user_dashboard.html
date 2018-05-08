@@ -95,12 +95,21 @@
   </tbody>
 </table>
 
+<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyASh_MzDRPXhWA2VlhANyBA5cPYJcOyOA4&libraries=places"></script>
+<script src="jquery.geocomplete.js"></script>
+
 <script>    
 
+  var in1 = document.getElementById('{{ form.startLocation.id }}');
+  var in2 = document.getElementById('{{ oform.startLocation.id }}');
 
-var sjc = {lat: 37.357944, lng: -121.897087};
-var sfo = {lat: 37.6213129, lng: -122.3789554};
-var oak = {lat: 37.7125689, lng: -122.2197428};
+  google.maps.event.addDomListener(window, 'load', function () {
+       var places = new google.maps.places.Autocomplete(in1);
+     });
+
+  google.maps.event.addDomListener(window, 'load', function () {
+       var places = new google.maps.places.Autocomplete(in2);
+     });
 
 
 </script>
