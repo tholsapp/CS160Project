@@ -27,14 +27,14 @@ class RegistrationForm(FlaskForm):
   # Credit Card Information
   card_number = StringField('Credit Card Number', validators=[DataRequired(),
     Length(min=16,max=16,message='Credit Card number must be 16-digits'),
-    Regexp(regex='[0-9]')])
+    Regexp(regex='[0-9]',message="Must use digits 0-9")])
   exp_month = SelectField('Experation Month', choices=months, validators=[DataRequired()], default='May')
   exp_year = SelectField('Experation Year', choices=years, validators=[DataRequired()])
   cvc = StringField('CVC', validators=[DataRequired(),
-    Regexp(regex='[0-9]')])
+    Regexp(regex='[0-9]',message="Must use digits 0-9")])
   zipcode = StringField('Zipcode', validators=[DataRequired(),
     Length(min=5,max=5,message='Invalid zipcode'),
-    Regexp(regex='[0-9]')])
+    Regexp(regex='[0-9]',message="Must use digits 0-9")])
   submit = SubmitField('Register')
 
   def validate_username(self, username):
@@ -46,6 +46,9 @@ class RegistrationForm(FlaskForm):
     user = User.query.filter_by(email=email.data).first()
     if user is not None:
       raise ValidationError('Please use a different email address.')
+    if email.data.split('@')[0][-1] == '.':
+      raise ValidationError('Invalid Email. . befor @ detected')
+
 
 
 class AcceptRideRequestForm(FlaskForm):
