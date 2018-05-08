@@ -2,6 +2,7 @@
 from flask_wtf import FlaskForm, Form
 from wtforms import StringField, RadioField, PasswordField, BooleanField, SelectField, SubmitField, HiddenField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Regexp
+from datetime import datetime
 
 from models import User
 from address_validation import AddressValidator
@@ -15,7 +16,7 @@ class LoginForm(FlaskForm):
 
 class RegistrationForm(FlaskForm):
   """ Registration Form  """
-  months = [('Jan', '01'),('Feb', '02'),('Mar', '03'),('Apr', '04'),('May', '05'),('Jun', '06'),('Jul', '07'),('Aug', '08'),('Sep', '09'),('Oct', '10'),('Nov', '11'),('Dec', '12')]
+  months = [('01', '01'),('02', '02'),('03', '03'),('04', '04'),('05', '05'),('06', '06'),('07', '07'),('08', '08'),('09', '09'),('10', '10'),('11', '11'),('12', '12')]
   years = [('2018','2018'),('2019','2019'),('2020','2020'),('2021','2021'),('2022','2022'),('2023','2023'),('2024','2024'),('2025','2025'),('2026','2026')]
 
   role = RadioField('User Type', choices=[('user','user role'),('driver','driver role')],default='user')
@@ -28,7 +29,7 @@ class RegistrationForm(FlaskForm):
   card_number = StringField('Credit Card Number', validators=[DataRequired(),
     Length(min=16,max=16,message='Credit Card number must be 16-digits'),
     Regexp(regex='[0-9]',message="Must use digits 0-9")])
-  exp_month = SelectField('Experation Month', choices=months, validators=[DataRequired()], default='May')
+  exp_month = SelectField('Experation Month', choices=months, validators=[DataRequired()], default='05')
   exp_year = SelectField('Experation Year', choices=years, validators=[DataRequired()])
   cvc = StringField('CVC', validators=[DataRequired(),
     Regexp(regex='[0-9]',message="Must use digits 0-9")])
@@ -49,6 +50,15 @@ class RegistrationForm(FlaskForm):
     if email.data.split('@')[0][-1] == '.':
       raise ValidationError('Invalid Email. . befor @ detected')
 
+  def validate_exp_month(self, exp_month):
+    now = datetime.now()
+    if now.month >= int(exp_month.data):
+      raise ValidationError('Expired Expiration Detected')
+
+  def validate_exp_year(self, exp_year):
+    now = datetime.now()
+    if now.year > int(exp_year.data):
+      raise ValidationError('Expired Expiration Detected')
 
 
 class AcceptRideRequestForm(FlaskForm):
@@ -92,8 +102,6 @@ class RideRequestForm(FlaskForm):
       self.startLocation.errors.append('Origin cannot match destination')
       self.endLocation.errors.append('Destination cannot match origin')
       return False
-
-    
 
     # check if there are logged in drivers
     users = User.query.all()
