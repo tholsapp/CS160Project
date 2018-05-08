@@ -17,8 +17,7 @@ var oak = {lat: 37.7125689, lng: -122.2197428};
 
 
 function initMap() {
-
-		// map options
+	// map options
 	var mapOptions = {
 		center: sjc,
 		zoom: 14
@@ -53,8 +52,6 @@ function start_animation(map, path, dmarker, cmarker, total_time, num_steps, lat
 	var speed_factor = 10; // run 10x faster
 	var current_time = 0;
 	var frequency = total_time / num_steps;
-
-
 
 	dmarker.setPosition(latlng[0]);
 
@@ -92,11 +89,7 @@ function start_animation(map, path, dmarker, cmarker, total_time, num_steps, lat
 		}
 	current_time++;
 	}, 1000 * frequency / speed_factor);
-
-	
 }
-
-
 
 // decodes a google.map.polyline string into lat and lng points
 function decode(encoded) {
@@ -130,7 +123,6 @@ function decode(encoded) {
   	return points
 }
 </script>
-
 
 <script async defer
      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyASh_MzDRPXhWA2VlhANyBA5cPYJcOyOA4&libraries=places,geometry&callback=initMap">

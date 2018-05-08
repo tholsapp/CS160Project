@@ -1,6 +1,6 @@
 
+from random import choice
 from passlib.hash import pbkdf2_sha256
-
 
 from flask import Flask, session, render_template, redirect, url_for, \
     current_app, flash, request, abort
@@ -17,6 +17,7 @@ from fserver import app, login_manager, db
 from models import User, Role, RideRequest
 from forms import LoginForm, RegistrationForm, RideRequestForm, AcceptRideRequestForm
 from directions_service import GMapDirectionService
+
 
 
 # Create a permission with a single Need, in this case a RoleNeed.
@@ -39,7 +40,7 @@ def user_dashboard(user):
   # if home to airport is submitted
   if form1.validate_on_submit():
     directions = GMapDirectionService(form1.startLocation, form1.endLocation)
-    price =  15 + (directions.total_distance / (directions.total_duration)) + (0.05 * directions.total_duration - 2 )
+    price =  15 + (directions.total_distance / (directions.total_duration)) + (0.05 * directions.total_duration - 2 ) # first two miles are free
     datetime_now = datetime.now()
     current_user.rides.append(RideRequest(
       user_id=current_user.id,
@@ -59,7 +60,7 @@ def user_dashboard(user):
   # if airport to home is submitted
   if form2.validate_on_submit():
     directions = GMapDirectionService(form2.endLocation, form2.startLocation)
-    price =  15 + (directions.total_distance / (directions.total_duration)) + (0.05 * directions.total_duration)
+    price =  15 + (directions.total_distance / (directions.total_duration)) + (0.05 * directions.total_duration - 2) # first two miles are free
     datetime_now = datetime.now()
     current_user.rides.append(RideRequest(
       user_id=current_user.id,
@@ -150,7 +151,6 @@ def driver_dashboard(driver):
     request.accepted = True
     request.is_active = True
     current_user.location = request.user_destination
-    
 
     dir1 = GMapDirectionService(request.driver_origin, request.user_origin)
     dir2 = GMapDirectionService(request.user_origin, request.user_destination)
@@ -187,7 +187,6 @@ def driver_dashboard(driver):
 
   return render_template('driver_dashboard.html', driver=driver, users=users, u1=user1, u2=user2,
     r1=user1_request, r2=user2_request, form1=form1, form2=form2)
-
 
 
 @app.route('/map/<userid>', methods=['GET', 'POST'])
@@ -233,7 +232,10 @@ def register():
       exp = form.exp_month.data + '/' + form.exp_year.data,
       cvc = form.cvc.data,
       zipcode = form.zipcode.data,
-      roles=[Role.query.filter_by(name=form.role.data).first(),]
+      location = choice(['1701 Airport Blvd, San Jose, CA 95110',
+                         'San Francisco International Aiport, San Francsco, CA 93128',
+                         '1 Airport Drive, Oakland, CA 94621']),
+      roles=[Role.query.filter_by(name=form.role.data).first(),] # set type of user
       ))
     db.session.commit()
     flash('Congratulations, you are now a registered user!')

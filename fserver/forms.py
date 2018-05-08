@@ -93,6 +93,8 @@ class RideRequestForm(FlaskForm):
       self.endLocation.errors.append('Destination cannot match origin')
       return False
 
+    
+
     # check if there are logged in drivers
     users = User.query.all()
     drivers = []
