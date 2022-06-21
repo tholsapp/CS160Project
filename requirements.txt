@@ -20,7 +20,7 @@ itsdangerous==0.24
 Jinja2==2.10
 MarkupSafe==1.0
 mimerender==0.6.0
-numpy==1.14.2
+numpy==1.22.0
 pandas==0.22.0
 passlib==1.7.1
 python-dateutil==2.7.2
